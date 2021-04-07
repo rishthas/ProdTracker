@@ -15,8 +15,8 @@ class Branch(models.Model):
         return self.name
 
 class Vendor(models.Model):
-    name = models.CharField(_("Branch Name"), max_length=50)
-    code = models.CharField(_("Branch Code"), max_length=50)
+    name = models.CharField(_("Vendor Name"), max_length=50)
+    code = models.CharField(_("Vendor Code"), max_length=50)
     
 
     class Meta:
@@ -35,13 +35,14 @@ class Product(models.Model):
     vendor = models.ForeignKey(Vendor, verbose_name=_("Vendor"), on_delete=models.CASCADE)
     model_no = models.CharField(_("Model No"), max_length=50) 
     purchase_date = models.DateField(_("Purchase Date"), auto_now=False, auto_now_add=False)   
-    branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.CASCADE,null=True,blank=True)
-    invoce_no = models.CharField(_("Invoice Number"), max_length=50)
-    customer_code = models.CharField(_("Customer Code"), max_length=50)
+    branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.SET_NULL,null=True,blank=True)
+    invoce_no = models.CharField(_("Invoice Number"), max_length=50,null=True,blank=True)
+    customer_code = models.CharField(_("Customer Code"), max_length=50,null=True,blank=True)
 
     class Meta:
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
+        unique_together=('vendor','model_no','serial_num')
 
     def __str__(self):
         return self.name
@@ -54,7 +55,7 @@ class Transfer(models.Model):
     date = models.DateField(_("Date"), auto_now=False, auto_now_add=False)    
     branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name=_("Product"), on_delete=models.CASCADE)
-
+    status = models.CharField(_("Status"), max_length=50,choices=(("I","In"),("O","Out")))
     class Meta:
         verbose_name = _("Transfer")
         verbose_name_plural = _("Transfers")

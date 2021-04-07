@@ -1,0 +1,150 @@
+{% extends "product/base.html" %}
+
+{% load i18n %}
+
+{% load static %}
+
+{% block head_title %} {% trans "Vendors" %} {% endblock head_title %}<
+
+{% block heading %} {% trans "Vendors" %}{% endblock heading %}
+
+{% block pagecss %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endblock pagecss %}
+
+ {% block breadcrums %}
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'vendor' %}">{% trans "Vendors" %}</a></li>
+        
+    </ol>
+{% endblock breadcrums %}
+
+{% block maincontent %}
+{% if messages %}
+            
+    {% for message in messages %}
+    {% comment %} <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> {% endcomment %}
+    
+    <div class="alert alert-custom alert-primary" role="alert">
+        <div class="alert-icon">
+            <div class="alert-text"><i class="fa fa-check-circle"></i>  {% if message.tags %}{{ message.tags|title}}{% endif %} : {{ message }}!</div>                    
+        </div>
+        
+    </div>
+    {% endfor %}
+
+
+{% endif %}
+<div class="card">
+              <div class="card-header">
+                <h3 class="card-title">List of Vendors</h3>
+                <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto float-right">
+                  <li class="nav-item">
+                            
+                            <a href="{% url 'add-vendor' %}" class="nav-link"> <i class="fas fa-plus-circle"></i> {% trans "Add Vendor" %}</a>
+                        </li>
+                </ul>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="example1" class="table table-bordered table-striped table-sm">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Vendor Code</th>
+                    <th>Vendor Name</th>
+                    <th>Action</th>
+                    
+
+                  </tr>
+                  </thead>
+                  
+                  
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+{% endblock maincontent %}
+
+
+{% block pagejs %}
+    <script>var csrf_token = '{{csrf_token}}';</script>
+
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+          var datatable = $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "processing": true,
+                "autoWidth": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "serverSide": true,
+                "ajax": '/api/vendor/?format=datatables',
+                columns: [
+                  { data: 'id' },
+                  { data: 'code' },
+                  { data: 'name' },
+                  { data: 'Action',"searchable": false,"orderable": false, "className":"align-middle text-center",
+                    "render": function(data,type,full,meta){
+                      console.log(full)
+                      var rtn_str = "";
+                      rtn_str = rtn_str + '<a dataId="'+ full.id + '"  class="terminal-edit"  href="/vendor/edit/'+ full.id +'/" title="Edit Vendor">\
+							          <i class="fas fa-edit text-primary"></i>\
+                        </a>\
+                        <a dataId="'+ full.id + '" dataName="' + full.name + '" class="vendor-delete" title="Delete">\
+                          <i class="fas fa-trash text-danger"></i>\
+                        </a>\
+                        ';
+                      return rtn_str;
+
+                    },
+
+                  },
+                  
+                ],
+                "initComplete": function(settings, json) {
+                  $(".vendor-delete").click(function(){
+                    // alert($(this).attr("dataId"));
+                    delete_vendor($(this).attr("dataId"),$(this).attr("dataName"));
+                  });
+                },
+                
+
+            });
+
+            function delete_vendor(id,name) {
+              if(confirm("Are you Sure on Deleting the Vendor ["+ name+"]. Note: All the transactions and product in this vendor also will be deleted !!! ")){
+                $.ajax({
+                  headers: { "X-CSRFToken": csrf_token },
+                  type: "DELETE",
+                  url: "/api/vendor/"+id+"/",
+                  success: function(data, textStatus, xhr){
+                    console.log("In Success");
+                    console.log(xhr.status);
+                    console.log(data);
+                    alert("The Vendor is deleted")
+                    datatable.ajax.reload();
+                  },
+                });
+              }
+              
+            }
+            
+        });
+    </script>
+{% endblock pagejs %}

@@ -138,7 +138,7 @@ MEDIA_ROOT =  BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-
+    "DATE_INPUT_FORMATS": ["%d-%m-%Y"],
     'DATETIME_FORMAT': "%d-%b-%Y %H:%M:%S",
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
