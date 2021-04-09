@@ -114,7 +114,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         for product_id in products:
             product = Product.objects.get(id=product_id)
             
-            transfer = Transfer(product=product,branch=product.branch,date=invoice_date,status="0",remark="{}/{}".format(invoice_no,cust_code))
+            transfer = Transfer(product=product,branch=product.branch,date=invoice_date,status="O",remark="{}/{}".format(invoice_no,cust_code))
             transfer.save()
             product.invoice_date = invoice_date
             product.invoce_no = invoice_no
