@@ -53,7 +53,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 aria-expanded="false" class="nav-link dropdown-toggle">Product</a>
                             <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
                                 <li><a href="{% url 'purchase' %}" class="dropdown-item">Purchase</a></li>
-                                <li><a href="#" class="dropdown-item">Transfer</a></li>
+                                <li><a href="{% url 'transfer' %}" class="dropdown-item">Transfer</a></li>
+                                <li><a href="{% url 'invoice' %}" class="dropdown-item">Link Invoice</a></li>
 
                                 <li class="dropdown-divider"></li>
 
@@ -68,6 +69,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <li class="nav-item">
                             
                             <a href="{% url 'vendor' %}" class="nav-link"> <i class="fa fa-industry"></i> {% trans "Vendor" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            
+                            <a href="{% url 'transfers' %}" class="nav-link"> <i class="fas fa-exchange-alt"></i> {% trans "Transfers" %}</a>
+                        </li>
+
+                        <li class="nav-item">
+                            
+                            <a href="{% url 'report' %}" class="nav-link"> <i class="fa fa-file"></i> {% trans "Reports" %}</a>
                         </li>
                     </ul>
 

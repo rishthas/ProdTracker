@@ -66,7 +66,7 @@
         <div class="form-group">
           <label> Purchase Date:</label>
             <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" id="purchase_date"/>
+                <input type="text" class="form-control  datetimepicker-input" data-target="#reservationdate" id="purchase_date"/>
                 <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                 </div>
@@ -76,7 +76,7 @@
       <div class="col-md-4 p-3">
         <div class="form-group">
           <label>Vendor</label>
-          <select class="form-control select2bs4" style="width: 100%;" id="vendor">
+          <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
             <option value=""></option>
 
             {% for vendor in vendors %}
@@ -91,7 +91,7 @@
 
         <div class="form-group">
           <label>Model</label>
-          <input type="text" class="form-control" placeholder="Model" id="model">
+          <input type="text" class="form-control " placeholder="Model" id="model">
         </div>
       </div>
     </div>
@@ -99,7 +99,7 @@
       <div class="col-md-6 p-3">
          <div class="form-group">
           <label>Serial Number</label>
-          <input type="text" class="form-control" placeholder="Serial Number" id="serial_num">
+          <input type="text" class="form-control " placeholder="Serial Number" id="serial_num">
         </div>
       </div>
     </div>
@@ -118,7 +118,7 @@
   <!-- /.card-header -->
   <div class="card-body">
     <table id="example1" class="table table-bordered table-striped table-sm">
-      <thead>
+      <thead class="thead-dark">
       <tr>
         <th>ID</th>
         <th>Date</th>

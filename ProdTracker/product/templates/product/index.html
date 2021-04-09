@@ -22,33 +22,90 @@
 {% endblock breadcrums %}
 
 {% block maincontent %}
-<div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Products</h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Vendor</th>
-                    <th>Vendor Code</th>
-                    <th>Model</th>
-                    <th>Serial No</th>
-                    <th>Branch</th>
-                    <th>Invoice No</th>
-                    <th>Customer Code</th>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card ">
+      <div class="card-header text-center bg-gradient-success">
+        <h3 class="card-title text-center">Total Product Counts</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table id="agg_table1" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Vendor Name</th>
+              <th>Vendor Code</th>
+              <th>Model No</th>
+              <th>Count</th>
 
-                  </tr>
-                  </thead>
-                  
-                  
-                </table>
-              </div>
-              <!-- /.card-body -->
-            </div>
+
+            </tr>
+          </thead>
+          <tbody>
+          <tbody>
+
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header text-center bg-gradient-warning">
+        <h3 class="card-title text-center">Un-Invoiced Product Counts</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table id="agg_table2" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Vendor Name</th>
+              <th>Vendor Code</th>
+              <th>Model No</th>
+              <th>Count</th>
+
+
+            </tr>
+          </thead>
+          <tbody>
+          <tbody>
+
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header text-center bg-gradient-danger">
+        <h3 class="card-title text-center">Product Counts - Not Transfered</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table id="agg_table3" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Vendor Name</th>
+              <th>Vendor Code</th>
+              <th>Model No</th>
+              <th>Count</th>
+
+
+            </tr>
+          </thead>
+          <tbody>
+          <tbody>
+
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+  
+</div>
+
 {% endblock maincontent %}
 
 
@@ -66,30 +123,93 @@
     <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
     <script>
-        var datatable = $(document).ready(function () {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": true,
-                "autoWidth": true,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                "serverSide": true,
-                "ajax": '/api/product/?format=datatables',
-                columns: [
-                  { data: 'id' },
-                  { data: 'purchase_date' },
-                  { data: 'vendor.code' },
-                  { data: 'vendor.name' },
-                  { data: 'model_no' },
-                  { data: 'serial_num' },
-                  
-                  { data: 'branch.name' },
-                  { data: 'invoce_no' },
-                  { data: 'customer_code' },
-                  // { data: 'duration' },
-                  // { data: 'Action', "searchable": false },
-                ],
+       $(document).ready(function () {
+            
 
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            function populateTable() {
+
+              $.ajax({
+                type: "GET",
+                url: "/api/product_agg/",
+                success: function (response) {
+                  console.log(response.results)
+                  $("#agg_table1 tbody td").remove();
+                  $("#agg_table1 tfoot td").remove();
+                  var cnt=0;
+                  $.each(response.results, function (indexInArray, row) { 
+                      var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
+                    //  console.log(content)
+                    $("#agg_table1").append(content);
+                    cnt = cnt + parseInt(row.cnt)
+                  });
+                  var footer_content = "<tfoot><tr><td colspan='3' class='text-center text-bold'>Total</td><td class='text-center text-bold'>"+ cnt + "</td></tr></tfoot>"
+                  $("#agg_table1").append(footer_content);
+                  console.log("finish")
+                }
+              });
+
+              $.ajax({
+                type: "GET",
+                url: "/api/product_agg/?uninvoiced=Y",
+                success: function (response) {
+                  console.log(response.results)
+                  $("#agg_table2 tbody td").remove();
+                  $("#agg_table2 tfoot td").remove();
+                  var cnt=0;
+                  
+                  $.each(response.results, function (indexInArray, row) { 
+                      var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
+                    //  console.log(content)
+                    $("#agg_table2").append(content);
+                    cnt = cnt + parseInt(row.cnt)
+
+                  });
+                  if(response.results.length == 0){
+                    var content="<tr><td colspan='4' class='text-center'>All Products are invoiced</td></tr>"
+                    $("#agg_table2").append(content);
+                  }
+                  var footer_content = "<tfoot><tr><td colspan='3' class='text-center text-bold'>Total</td><td class='text-center text-bold'>"+ cnt + "</td></tr></tfoot>"
+
+                  $("#agg_table2").append(footer_content);
+
+
+                  console.log("finish")
+                }
+              });
+
+              $.ajax({
+                type: "GET",
+                url: "/api/product_agg/?untransfered=Y",
+                success: function (response) {
+                  console.log(response.results)
+                  $("#agg_table3 tbody td").remove();
+                  $("#agg_table3 tfoot td").remove();
+                  var cnt=0;
+                  
+                  $.each(response.results, function (indexInArray, row) { 
+                      var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
+                    //  console.log(content)
+                    $("#agg_table3").append(content);
+                    cnt = cnt + parseInt(row.cnt)
+
+                  });
+                  if(response.results.length == 0){
+                    var content="<tr><td colspan='4' class='text-center'>All Products are invoiced</td></tr>"
+                    $("#agg_table3").append(content);
+                  }
+                  var footer_content = "<tfoot><tr><td colspan='3' class='text-center text-bold'>Total</td><td class='text-center text-bold'>"+ cnt + "</td></tr></tfoot>"
+
+                  $("#agg_table3").append(footer_content);
+
+
+                  console.log("finish")
+                }
+              });
+              
+              setTimeout(populateTable,10000)
+              
+            }
+            populateTable();
             
         });
     </script>

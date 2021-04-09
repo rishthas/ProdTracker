@@ -19,11 +19,29 @@ def branch(request):
 def vendor(request):
     return render(request,'product/vendor.html')
 
+def transfers(request):
+    return render(request,'product/transfers.html')
+
+def invoice(request):
+    return render(request,'product/invoice.html')
+
+def report(request):
+    branches = Branch.objects.all()
+    vendor = Vendor.objects.all()
+
+    return render(request,'product/report.html',{'branches':branches,'vendors':vendor})
+
 def purchase(request):
     branch = Branch.objects.all()
     vendor = Vendor.objects.all()
 
     return render(request,'product/purchase.html',{'branchs':branch,'vendors':vendor})
+
+def transfer(request):
+    branches = Branch.objects.all()
+    vendor = Vendor.objects.all()
+
+    return render(request,'product/transfer.html',{'branches':branches,'vendors':vendor})
 
 
 def add_branch(request):

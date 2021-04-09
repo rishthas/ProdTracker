@@ -36,6 +36,7 @@ class Product(models.Model):
     model_no = models.CharField(_("Model No"), max_length=50) 
     purchase_date = models.DateField(_("Purchase Date"), auto_now=False, auto_now_add=False)   
     branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.SET_NULL,null=True,blank=True)
+    invoice_date = models.DateField(_("Invoice Date"),null=True,blank=True)
     invoce_no = models.CharField(_("Invoice Number"), max_length=50,null=True,blank=True)
     customer_code = models.CharField(_("Customer Code"), max_length=50,null=True,blank=True)
 
@@ -45,7 +46,7 @@ class Product(models.Model):
         unique_together=('vendor','model_no','serial_num')
 
     def __str__(self):
-        return self.name
+        return self.serial_num
 
     # def get_absolute_url(self):
     #     return reverse("Product_detail", kwargs={"pk": self.pk})
@@ -56,6 +57,8 @@ class Transfer(models.Model):
     branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name=_("Product"), on_delete=models.CASCADE)
     status = models.CharField(_("Status"), max_length=50,choices=(("I","In"),("O","Out")))
+    remark = models.CharField(_("Remarks"), max_length=100,null=True,blank=True)
+    event_time = models.DateTimeField(_("Event Time"), auto_now=True, auto_now_add=False)
     class Meta:
         verbose_name = _("Transfer")
         verbose_name_plural = _("Transfers")
