@@ -235,6 +235,7 @@
           } 
 
           $("#serial_num").keydown(function (e) { 
+            var letters = /^[0-9a-zA-Z]+$/;
             var code = (e.keyCode ? e.keyCode : e.which);
             if(code==13)// Enter key hit
             {
@@ -253,7 +254,9 @@
             }
             else
             {
+                if(String.fromCharCode(code).match(letters)){
                 barcode=barcode+String.fromCharCode(code);
+                }
             }
           });
           

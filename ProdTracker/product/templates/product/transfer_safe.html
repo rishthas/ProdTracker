@@ -113,7 +113,7 @@
   
   <div class="card-body">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-6 p-3">
         <div class="form-group">
           <label> Transfer Date:</label>
             <div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -124,7 +124,7 @@
             </div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6 p-3">
         <div class="form-group">
           <label>To Branch</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="to_branch">
@@ -140,16 +140,8 @@
       </div>
     
     </div>
-    <div class="row justify-content-center" >
-      <div class="col-md-6">
-         <div class="form-group">
-          <label>Serial Number</label>
-          <input type="text" class="form-control " placeholder="Serial Number" id="serial_num">
-        </div>
-      </div>
-    </div>
     <div class="row justify-content-center">
-      <button type="button" id="transfer" class="btn bg-gradient-primary"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i> Transfer</button>
+      <button type="button" id="transfer" class="btn btn-primary"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i> Transfer</button>
 
     </div>
   </div>
@@ -157,17 +149,45 @@
 
 <div class="row">
 
- 
-  <div class="col-12">
+  <div class="col-lg-6">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Selected Product </h3>
+        <h3 class="card-title">List of Product </h3>
 
       </div>
       <!-- /.card-header -->
       <div class="card-body">
-        <table id="sel_prd_table" class="table table-bordered table-striped table-sm" style="width: 100%;">
-          <thead class="bg-gradient-dark">
+        <table id="example1" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th><input type="checkbox" value="" id="select-all" /></th>
+              <th>ID</th>
+              <th>Vendor</th>
+              <th>Vendor Code</th>
+              <th>Model</th>
+              <th>Serial No</th>
+              <th>Branch</th>
+
+
+            </tr>
+          </thead>
+
+
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Selected of Product </h3>
+
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table id="sel_prd_table" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
             <tr>
               <th></th>
               <th>ID</th>
@@ -193,59 +213,6 @@
   <br/>
   <h2>Please Wait while System Transfer the product...</h2>
 </div>
-<div class="modal fade" id="prds_modal" data-backdrop="static" tabindex="-1" role="dialog"
-aria-labelledby="staticBackdrop" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header bg-gradient-dark">
-        <h4 class="modal-title">Select the productl</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>There are multiple product with same Serial Number. Please select the correct one.</p>
-        <p>
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">List of Product </h3>
-      
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <table id="example1" class="table table-bordered table-striped table-sm" style="width: 100%;">
-                <thead class="thead-dark">
-                  <tr>
-                    <th><input type="checkbox" value="" id="select-all" /></th>
-                    <th>ID</th>
-                    <th>Vendor</th>
-                    <th>Vendor Code</th>
-                    <th>Model</th>
-                    <th>Serial No</th>
-                    <th>Branch</th>
-      
-      
-                  </tr>
-                </thead>
-      
-      
-              </table>
-            </div>
-            <!-- /.card-body -->
-          </div>
-        </p>
-
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal">Close</button>
-        <button type="button" class="btn bg-gradient-primary" id="prd_select">Select</button>
-      </div>
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
 {% endblock maincontent %}
 
 
@@ -294,86 +261,9 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
     <script src="{% static 'plugins/datatables-scroller/js/scroller.bootstrap4.min.js' %}"></script>
     <script>
         $(document).ready(function () {
-          var barcode="";
-          selected_prd = [];
-          function fetch_prd() {
-            if ($("#to_branch").val() == "") {
-              alert("Please select To Branch and read the barcode Again");
-              $("#serial_num").val("");
-              $("#to_branch").focus();
-              
-              barcode="";
-              return false;
-            }
-            var product_list_url = '/api/product/?format=datatables&for_transfer=Y&to_branch=' + $("#to_branch").val() + '&serial_num=' + $("#serial_num").val();
-            console.log(product_list_url)
-            $.ajax({
-              type: "GET",
-              url: product_list_url,
-              success: function (response) {
-                console.log(response)
-                var eligible = true;
-                if (response.data.length == 1) {
-                  $.each(response.data, function (indexInArray, row) {
-                    eligible = true;
-                    $.each(selected_prd, function (indexInArray, prd_row) {
-                      if (row.id == prd_row.id) {
-                        eligible = false
-                        return false
-                      }
-
-                    });
-                    if (eligible) {
-                      selected_prd.push(row);
-                    }
 
 
 
-                  });
-                }
-                if(response.data.length > 1){
-                  multi_prd_tbl.clear().draw();
-                  multi_prd_tbl.rows.add(response.data);
-                  multi_prd_tbl.columns.adjust().draw();
-                  $("#prds_modal").modal('show');
-                  multi_prd_tbl.columns.adjust().draw();
-
-                }
-
-                sel_prd_table.clear().draw();
-                sel_prd_table.rows.add(selected_prd);
-                sel_prd_table.columns.adjust().draw();
-                sel_prd_table.rows().select();
-
-
-              }
-            });
-            return true;
-          }
-          $("#serial_num").keydown(function (e) {
-            var letters = /^[0-9a-zA-Z]+$/;
-            var code = (e.keyCode ? e.keyCode : e.which);
-            if (code == 13)// Enter key hit
-            {
-              if (fetch_prd()) {
-                barcode = "";
-                $("#serial_num").val("");
-              }
-            }
-            else if (code == 9)// Tab key hit
-            {
-              if (fetch_prd()) {
-                barcode = "";
-                $("#serial_num").val("");
-              }
-
-            }
-            else {
-              if (String.fromCharCode(code).match(letters)) {
-                barcode = barcode + String.fromCharCode(code);
-              }
-            }
-          });
 
 
             $('#reservationdate').datetimepicker({
@@ -385,8 +275,11 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
             });
 
             var product_list_url = '/api/product/?format=datatables&for_transfer=Y';
-            var multi_prd_tbl = $("#example1").DataTable({
-              data: selected_prd,
+            var datatable = $("#example1").DataTable({
+              "scrollX": true,
+              "processing": true,
+              "serverSide": true,
+              "ajax": product_list_url,
               columns: [
                 { data: 'Action', "searchable": false, "bSortable": false },
                 { data: 'id' },
@@ -418,72 +311,78 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
 
             });
 
-            
+            $("#select-all").click(function (e) {
+              if (this.checked) {
+                datatable.rows().select();
+              } else {
+                datatable.rows().deselect();
+              }
 
-            
-            // datatable.on('select', function (e, dt, type, indexes) {
-            //   console.log(indexes);
-            //   if (type === 'row') {
-            //     var data = datatable.rows(indexes).data();
-            //     console.log(data);
-            //     var in_array_count = 0;
-            //     $.each(data, function (indexInArray, valueOfElement) {
-            //       console.log(valueOfElement.serial_num)
+            });
 
-            //       if (selected_prd.length == 0) {
-            //         console.log("selected_prd is empty");
-            //         selected_prd.push(valueOfElement);
-            //         console.log("selected_prd is empty===Pushed - " + valueOfElement);
-            //       }
-            //       else {
-            //         console.log("selected_prd is not empty");
-            //         console.log(selected_prd)
-            //         in_array_count = 0;
-            //         $.each(selected_prd, function (indexInArray, selected) {
-            //           console.log("selected.id :- " + selected.id)
-            //           console.log("valueOfElement.id :- " + valueOfElement.id)
-            //           if (selected.id == valueOfElement.id) {
-            //             // console.log("Pushing - "+ valueOfElement)
-            //             // selected_prd.push(valueOfElement);
-            //             in_array_count = in_array_count + 1;
-            //           }
-            //         });
+            selected_prd = [];
+            datatable.on('select', function (e, dt, type, indexes) {
+              console.log(indexes);
+              if (type === 'row') {
+                var data = datatable.rows(indexes).data();
+                console.log(data);
+                var in_array_count = 0;
+                $.each(data, function (indexInArray, valueOfElement) {
+                  console.log(valueOfElement.serial_num)
 
-            //         if (in_array_count == 0) {
-            //           console.log("in_array_count = " + in_array_count + " Pushing - " + valueOfElement);
-            //           selected_prd.push(valueOfElement);
-            //         }
-            //       }
-            //     });
-            //     console.log("Selcted Prd")
-            //     console.log(selected_prd)
-            //     sel_prd_table.clear().draw();
-            //     sel_prd_table.rows.add(selected_prd);
-            //     sel_prd_table.columns.adjust().draw();
-            //     sel_prd_table.rows().select();
+                  if (selected_prd.length == 0) {
+                    console.log("selected_prd is empty");
+                    selected_prd.push(valueOfElement);
+                    console.log("selected_prd is empty===Pushed - " + valueOfElement);
+                  }
+                  else {
+                    console.log("selected_prd is not empty");
+                    console.log(selected_prd)
+                    in_array_count = 0;
+                    $.each(selected_prd, function (indexInArray, selected) {
+                      console.log("selected.id :- " + selected.id)
+                      console.log("valueOfElement.id :- " + valueOfElement.id)
+                      if (selected.id == valueOfElement.id) {
+                        // console.log("Pushing - "+ valueOfElement)
+                        // selected_prd.push(valueOfElement);
+                        in_array_count = in_array_count + 1;
+                      }
+                    });
+
+                    if (in_array_count == 0) {
+                      console.log("in_array_count = " + in_array_count + " Pushing - " + valueOfElement);
+                      selected_prd.push(valueOfElement);
+                    }
+                  }
+                });
+
+                sel_prd_table.clear().draw();
+                sel_prd_table.rows.add(selected_prd);
+                sel_prd_table.columns.adjust().draw();
+                sel_prd_table.rows().select();
 
 
-            //   }
-            // });
+              }
+            });
 
-            // datatable.on( 'deselect', function ( e, dt, type, indexes ) {
-            //     if ( type === 'row' ) {
-            //         var data = datatable.rows( indexes ).data();
-            //         $.each(data, function (indexInArray, valueOfElement) { 
-            //             console.log(valueOfElement.id)  
-            //             // selected_prd.push(valueOfElement);
-            //             selected_prd = RemoveNode(valueOfElement.id);
-            //         });
+            datatable.on( 'deselect', function ( e, dt, type, indexes ) {
+                if ( type === 'row' ) {
+                    var data = datatable.rows( indexes ).data();
+                    $.each(data, function (indexInArray, valueOfElement) { 
+                        console.log(valueOfElement.id)  
+                        // selected_prd.push(valueOfElement);
+                        selected_prd = RemoveNode(valueOfElement.id);
+                    });
                     
-            //         console.log(selected_prd)
-            //         sel_prd_table.clear().draw();
-            //         sel_prd_table.rows.add(selected_prd);
-            //         sel_prd_table.columns.adjust().draw();
-            //         sel_prd_table.rows().select();
+                    console.log(selected_prd)
+                    sel_prd_table.clear().draw();
+                    sel_prd_table.rows.add(selected_prd);
+                    sel_prd_table.columns.adjust().draw();
+                    sel_prd_table.rows().select();
                     
-            //         // do something with the ID of the selected items
-            //     }
-            // } );
+                    // do something with the ID of the selected items
+                }
+            } );
 
 
             function RemoveNode(id) {
@@ -541,29 +440,25 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
 
             });
 
-            sel_prd_table.on('deselect', function (e, dt, type, indexes) {
-              if (confirm("Are you sure to remove the item?")) {
-                if (type === 'row') {
-                  var data = sel_prd_table.rows(indexes).data();
-                  $.each(data, function (indexInArray, valueOfElement) {
-                    console.log(valueOfElement.id)
-                    // selected_prd.push(valueOfElement);
-                    selected_prd = RemoveNode(valueOfElement.id);
-                  });
-
-                  console.log(selected_prd)
-                  sel_prd_table.clear().draw();
-                  sel_prd_table.rows.add(selected_prd);
-                  sel_prd_table.columns.adjust().draw();
-                  sel_prd_table.rows().select();
-
-                // do something with the ID of the selected items
+            sel_prd_table.on( 'deselect', function ( e, dt, type, indexes ) {
+                
+                if ( type === 'row' ) {
+                    var data = sel_prd_table.rows( indexes ).data();
+                    $.each(data, function (indexInArray, valueOfElement) { 
+                        console.log(valueOfElement.id)  
+                        // selected_prd.push(valueOfElement);
+                        selected_prd = RemoveNode(valueOfElement.id);
+                    });
+                    
+                    console.log(selected_prd)
+                    sel_prd_table.clear().draw();
+                    sel_prd_table.rows.add(selected_prd);
+                    sel_prd_table.columns.adjust().draw();
+                    sel_prd_table.rows().select();
+                    
+                    // do something with the ID of the selected items
                 }
-              }
-              else{
-                sel_prd_table.rows().select();
-              }
-            });
+            } );
 
             $("#transfer").click(function (e) {
               if ($.trim($("#purchase_date").val()) == "") {
@@ -606,7 +501,7 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 success: function (response) {
                   $('#overlay').fadeOut();
                   toastr.success('The products are transfered ');
-                  // datatable.ajax.reload();
+                  datatable.ajax.reload();
                   selected_prd =[];
                   sel_prd_table.clear().draw();
                   sel_prd_table.rows.add(selected_prd);
@@ -626,44 +521,12 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
 
             });
 
-
-            $("#prd_select").click(function (e) { 
-              var products = multi_prd_tbl.rows({ selected: true }).data();
-
-              $.each(products, function (indexInArray, row) { 
-                if(selected_prd.length == 0){
-                  selected_prd.push(row);
-                }
-                else{
-                  $.each(selected_prd, function (indexInArray, sel_prd) { 
-
-                  if (sel_prd.id != row.id){
-                    selected_prd.push(row);
-
-                  }
-                  
-                  });
-
-                }
-                
-                
-                 
-              });
-
-              sel_prd_table.clear().draw();
-              sel_prd_table.rows.add(selected_prd);
-              sel_prd_table.columns.adjust().draw();
-              sel_prd_table.rows().select();
-              $("#prds_modal").modal('hide');
-              
+            $("#to_branch").change(function (e) { 
+              var refreshUrl = '/api/product/?format=datatables&for_transfer=Y&to_branch='+$("#to_branch").val();
+              console.log(refreshUrl)
+              datatable.ajax.url(refreshUrl).load();
+              datatable.columns.adjust();
             });
-
-            // $("#to_branch").change(function (e) { 
-            //   var refreshUrl = '/api/product/?format=datatables&for_transfer=Y&to_branch='+$("#to_branch").val();
-            //   console.log(refreshUrl)
-            //   datatable.ajax.url(refreshUrl).load();
-            //   datatable.columns.adjust();
-            // });
 
           });
     </script>
