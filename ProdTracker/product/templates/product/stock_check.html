@@ -1,0 +1,325 @@
+{% extends "product/base.html" %}
+
+{% load i18n %}
+
+{% load static %}
+
+{% block head_title %} {% trans "Check Stock" %} {% endblock head_title %}<
+
+{% block heading %} {% trans "Check Stock" %}{% endblock heading %}
+
+{% block pagecss %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css' %}">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}">
+  <!-- BS Stepper -->
+  <link rel="stylesheet" href="{% static 'plugins/bs-stepper/css/bs-stepper.min.css' %}">
+  <!-- dropzonejs -->
+  <link rel="stylesheet" href="{% static 'plugins/dropzone/min/dropzone.min.css' %}">
+   <link rel="stylesheet" href="{% static 'plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/sweetalert2/sweetalert2.min.css' %}">
+{% endblock pagecss %}
+
+ {% block breadcrums %}
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'branch' %}">{% trans "Check Stock" %}</a></li>
+        
+    </ol>
+{% endblock breadcrums %}
+
+{% block maincontent %}
+{% if messages %}
+            
+    {% for message in messages %}
+    {% comment %} <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> {% endcomment %}
+    
+    <div class="alert alert-custom alert-primary" role="alert">
+        <div class="alert-icon">
+            <div class="alert-text"><i class="fa fa-check-circle"></i>  {% if message.tags %}{{ message.tags|title}}{% endif %} : {{ message }}!</div>                    
+        </div>
+        
+    </div>
+    {% endfor %}
+
+
+{% endif %}
+<div class="card">
+  
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Month</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="month">
+            
+
+            {% for month in months %}
+              <option value="{{month.no}}" {% if month.no == current_month %}selected{% endif %}>{{month.text}}</option>
+              
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Year</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="year">
+            <option value=""></option>
+
+            {% for year in years %}
+              <option value="{{year}}" {% if year == current_year %}selected{% endif %}>{{year}}</option>
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+    
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Vendor</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
+            <option value="">No Selected</option>
+            
+            {% for vendor in vendors %}
+              <option value="{{vendor.id}}">{{vendor.code}}/{{vendor.name}}</option>
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+
+        <div class="form-group">
+          <label>Model</label>
+          <input type="text" class="form-control " placeholder="Model" id="model">
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center" >
+      <div class="col-md-6 p-3">
+         <div class="form-group">
+          <label>Serial Number</label>
+          <input type="text" class="form-control " placeholder="Serial Number" id="serial_num">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">List of Stocked Product </h3>
+    <!-- <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto float-right">
+      <li class="nav-item">
+                
+                <a href="{% url 'add-branch' %}" class="nav-link"> <i class="fas fa-plus-circle"></i> {% trans "Add Branch" %}</a>
+            </li>
+    </ul> -->
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    <table id="example1" class="table table-bordered table-striped table-sm">
+      <thead class="thead-dark">
+      <tr>
+        <th>Month</th>
+        <th>Year</th>
+        <th>Vendor Code</th>
+        <th>Vendor Name</th>
+        <th>Model</th>
+        <th>Serial No</th>
+       
+        
+
+      </tr>
+      </thead>
+      
+      
+    </table>
+  </div>
+  <!-- /.card-body -->
+</div>
+{% endblock maincontent %}
+
+
+{% block pagejs %}
+    <script>var csrf_token = '{{csrf_token}}';</script>
+
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <!-- Select2 -->
+    <script src="{% static 'plugins/select2/js/select2.full.min.js' %}"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="{% static 'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js' %}"></script>
+    <!-- InputMask -->
+    <script src="{% static 'plugins/moment/moment.min.js' %}"></script>
+    <script src="{% static 'plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+    <!-- date-range-picker -->
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <!-- bootstrap color picker -->
+    <script src="{% static 'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <!-- Bootstrap Switch -->
+    <script src="{% static 'plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+    <!-- BS-Stepper -->
+    <script src="{% static 'plugins/bs-stepper/js/bs-stepper.min.js' %}"></script>
+    <!-- dropzonejs -->
+    <script src="{% static 'plugins/dropzone/min/dropzone.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- SweetAlert2 -->
+    <script src="{% static 'plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+    <!-- Toastr -->
+    <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+          var barcode="";
+          function purchase(barcode) {
+            serial_num = $("#serial_num").val();
+            
+            
+            vendor = $.trim($("#vendor").val());
+            model_no=$.trim($("#model").val());
+            purchase_date = $.trim($("#purchase_date").val());
+            data = {
+                "serial_num": serial_num,
+                "model_no": model_no,
+                "month": $("#month").val(),
+                "year": $("#year").val(),
+                "vendor": vendor
+            };
+            $.ajax({
+              headers: { "X-CSRFToken": csrf_token },
+              type: "POST",
+              url: "/api/product/do_stock/",
+              data: data,
+              dataType: "JSON",
+              success: function (response) {
+                toastr.success('The product ['+ serial_num + '] is marked as stocked for the month ');
+                datatable.ajax.reload();
+
+              },
+              error:function(xhr,status,error,){
+              console.log("In Error");
+              console.log(xhr.responseJSON.message);
+              console.log(status);
+              console.log(error);
+              Swal.fire("Error!",xhr.responseJSON.message,"error");
+              return false;
+              }
+            });
+            
+            return true
+            
+          } 
+
+          $("#serial_num").keydown(function (e) { 
+            var letters = /^[0-9a-zA-Z]+$/;
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if(code==13)// Enter key hit
+            {
+                if(purchase(barcode)){
+                  barcode=""; 
+                  $("#serial_num").val("");
+                  $("#vendor").val("");
+                  $('#vendor').trigger('change');
+                  $("#model").val("");
+                }           
+            }
+            else if(code==9)// Tab key hit
+            {
+              if(purchase(barcode)){
+                  barcode=""; 
+                  $("#serial_num").val("");
+                  $("#vendor").val("");
+                  $('#vendor').trigger('change');
+                  $("#model").val("");
+                }            
+
+            }
+            else
+            {
+                if(String.fromCharCode(code).match(letters)){
+                barcode=barcode+String.fromCharCode(code);
+                }
+            }
+          });
+          
+
+          
+          $('.select2bs4').select2({
+            theme: 'bootstrap4'
+          });
+          var datatable_url = '/api/stock_check/?format=datatables&month='+ $("#month").val() + '&year='+ $("#year").val();
+
+          var datatable = $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": true,
+              "processing": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "serverSide": true,
+               "ajax": datatable_url,
+                columns: [
+                  { data: 'month_str' ,"searchable": false,"orderable": false,},
+                  { data: 'year'},
+                  { data: 'product.vendor.code' },
+                  { data: 'product.vendor.name' },
+                  { data: 'product.model_no' },
+                  { data: 'product.serial_num' },
+                  
+                ]
+                
+
+            });
+          
+            function refresh_datatable() {
+              refreshUrl = '/api/stock_check/?format=datatables&month='+ $("#month").val() + '&year='+ $("#year").val();
+              console.log(refreshUrl);
+              datatable.ajax.url(refreshUrl).load();
+              datatable.columns.adjust();
+              
+            }
+
+            $("#month").change(function (e) { 
+              refresh_datatable();
+              
+            });
+            $("#year").change(function (e) { 
+              refresh_datatable();
+              
+            });
+
+            
+            
+        });
+    </script>
+{% endblock pagejs %}

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from product.models import Branch,Vendor,Product,Transfer
+from product.models import Branch,Vendor,Product,Transfer,StockCheck
+import calendar
 
 class BranchSerializer(serializers.ModelSerializer):
     Action = serializers.CharField(max_length=50,default=None,read_only=True)
@@ -57,3 +58,21 @@ class TrasferSerializer(serializers.ModelSerializer):
         representation['branch'] = BranchSerializer(instance.branch).data
         representation['product'] = ProductSerializer(instance.product).data
         return representation 
+
+
+
+class StockCheckSerializer(serializers.ModelSerializer):
+    Action = serializers.CharField(max_length=50,default=None,read_only=True)
+    month_str = serializers.SerializerMethodField()
+    class Meta:
+        model=StockCheck
+        fields="__all__"
+    
+    def to_representation(self, instance):
+        representation = super(StockCheckSerializer, self).to_representation(instance)
+        representation['product'] = ProductSerializer(instance.product).data
+        return representation
+    
+    def get_month_str(self,obj):
+        return calendar.month_name[int(obj.month)]
+

@@ -66,3 +66,22 @@ class Transfer(models.Model):
     def __str__(self):
         return self.name
 
+
+
+class StockCheck(models.Model):
+    
+    month = models.IntegerField(_("Month"))
+    year = models.IntegerField(_("Year"))
+    event_time = models.DateTimeField(_("Event Time"), auto_now=True, auto_now_add=False)
+    product = models.ForeignKey(Product, verbose_name=_("Product"), on_delete=models.CASCADE)
+
+
+    
+
+    class Meta:
+        verbose_name = _("StockCheck")
+        verbose_name_plural = _("StockChecks")
+
+    def __str__(self):
+        return "{}_{}_{}".format(self.product.serial_num,self.month,self.year)
+

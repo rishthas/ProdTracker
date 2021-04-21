@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from .models import Branch,Vendor
+from datetime import datetime
 
 
 
@@ -30,6 +31,34 @@ def report(request):
     vendor = Vendor.objects.all()
 
     return render(request,'product/report.html',{'branches':branches,'vendors':vendor})
+
+
+def stock_report(request):
+    branches = Branch.objects.all()
+    vendor = Vendor.objects.all()
+    months = [
+        {"no":1,"text":"Jan"},
+        {"no":2,"text":"Feb"},
+        {"no":3,"text":"Mar"},
+        {"no":4,"text":"Apr"},
+        {"no":5,"text":"May"},
+        {"no":6,"text":"Jun"},
+        {"no":7,"text":"Jul"},
+        {"no":8,"text":"Aug"},
+        {"no":9,"text":"Sep"},
+        {"no":10,"text":"Oct"},
+        {"no":11,"text":"Nov"},
+        {"no":12,"text":"Dec"},
+    ]
+    today = datetime.today()
+    current_year = today.year
+    current_month = today.month
+    years = []
+    for i in range(current_year-5,current_year+5):
+        years.append(i)
+
+    return render(request,'product/stock_report.html',{'branches':branches,'vendors':vendor,'months':months,'years':years,'current_year':current_year,'current_month':current_month})
+
 
 def purchase(request):
     branch = Branch.objects.all()
@@ -105,3 +134,31 @@ def edit_vendor(request,id):
     else:
         form = BranchForm(instance=instance)
     return render(request,'product/add_vendor.html',{'form':form})
+
+
+def stock_check(request):
+    months = [
+        {"no":1,"text":"Jan"},
+        {"no":2,"text":"Feb"},
+        {"no":3,"text":"Mar"},
+        {"no":4,"text":"Apr"},
+        {"no":5,"text":"May"},
+        {"no":6,"text":"Jun"},
+        {"no":7,"text":"Jul"},
+        {"no":8,"text":"Aug"},
+        {"no":9,"text":"Sep"},
+        {"no":10,"text":"Oct"},
+        {"no":11,"text":"Nov"},
+        {"no":12,"text":"Dec"},
+    ]
+    today = datetime.today()
+    current_year = today.year
+    current_month = today.month
+    years = []
+    for i in range(current_year-5,current_year+5):
+        years.append(i)
+    
+    vendor = Vendor.objects.all()
+
+
+    return render(request,'product/stock_check.html',{'months':months,'years':years,'current_year':current_year,'current_month':current_month,'vendors':vendor})

@@ -74,11 +74,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             
                             <a href="{% url 'transfers' %}" class="nav-link"> <i class="fas fa-exchange-alt"></i> {% trans "Transfers" %}</a>
                         </li>
-
                         <li class="nav-item">
                             
-                            <a href="{% url 'report' %}" class="nav-link"> <i class="fa fa-file"></i> {% trans "Reports" %}</a>
+                            <a href="{% url 'stock' %}" class="nav-link"> <i class="fas fa-clipboard-check"></i> {% trans "Take Stock" %}</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a id="dropdownSubMenu2" href="#" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false" class="nav-link dropdown-toggle">Reports</a>
+                            <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                                <li><a href="{% url 'report' %}" class="dropdown-item">Product Report</a></li>
+                                <li><a href="{% url 'stock-report' %}" class="dropdown-item">Stock Report</a></li>
+
+                                <li class="dropdown-divider"></li>
+
+                                
+                            </ul>
+                        </li>
+
+                        
                     </ul>
 
                     

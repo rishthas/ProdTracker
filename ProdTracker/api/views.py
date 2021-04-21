@@ -1,29 +1,29 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from product.models import Branch,Vendor,Product,Transfer
-from .serializers import BranchSerializer,VendorSerializer,ProductSerializer,TrasferSerializer,ProductAggSerializer
+from rest_framework import viewsets, status
+from product.models import Branch, Vendor, Product, Transfer, StockCheck
+from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer, StockCheckSerializer
 from django.db.models import Count
 import datetime
+import calendar
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-
 
 
 # Create your views here.
 
 
 class BranchViewSet(viewsets.ModelViewSet):
-    serializer_class=BranchSerializer
+    serializer_class = BranchSerializer
     queryset = Branch.objects.all().order_by('-id')
 
 
 class VendorViewSet(viewsets.ModelViewSet):
-    serializer_class=VendorSerializer
+    serializer_class = VendorSerializer
     queryset = Vendor.objects.all().order_by('-id')
 
+
 class ProductViewSet(viewsets.ModelViewSet):
-    serializer_class=ProductSerializer
+    serializer_class = ProductSerializer
     queryset = Product.objects.all().order_by('-id')
 
     def get_queryset(self):
@@ -34,54 +34,84 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(invoce_no__isnull=True)
         if self.request.query_params.get('for_invoice', None) == "Y":
             print("for_transfer")
-            queryset = queryset.filter(invoce_no__isnull=True,branch__isnull=False)
-        
+            queryset = queryset.filter(
+                invoce_no__isnull=True, branch__isnull=False)
+
         if self.request.query_params.get('to_branch', None):
             print("to_branch")
-            queryset = queryset.exclude(branch__id=self.request.query_params.get('to_branch', None))
-        
+            queryset = queryset.exclude(
+                branch__id=self.request.query_params.get('to_branch', None))
+
         if self.request.query_params.get('p_from_date', None):
             print("p_from_date")
-            queryset = queryset.filter(purchase_date__gte=datetime.datetime.strptime(self.request.query_params.get('p_from_date', None),'%d-%m-%Y').date())
+            queryset = queryset.filter(purchase_date__gte=datetime.datetime.strptime(
+                self.request.query_params.get('p_from_date', None), '%d-%m-%Y').date())
         if self.request.query_params.get('p_to_date', None):
             print("p_to_date")
-            queryset = queryset.filter(purchase_date__lte=datetime.datetime.strptime(self.request.query_params.get('p_to_date', None),'%d-%m-%Y').date())
+            queryset = queryset.filter(purchase_date__lte=datetime.datetime.strptime(
+                self.request.query_params.get('p_to_date', None), '%d-%m-%Y').date())
         if self.request.query_params.get('i_from_date', None):
             print("i_from_date")
-            queryset = queryset.filter(invoice_date__gte=datetime.datetime.strptime(self.request.query_params.get('i_from_date', None),'%d-%m-%Y').date())
+            queryset = queryset.filter(invoice_date__gte=datetime.datetime.strptime(
+                self.request.query_params.get('i_from_date', None), '%d-%m-%Y').date())
         if self.request.query_params.get('i_to_date', None):
             print("i_to_date")
-            queryset = queryset.filter(invoice_date__lte=datetime.datetime.strptime(self.request.query_params.get('i_to_date', None),'%d-%m-%Y').date())
-        
+            queryset = queryset.filter(invoice_date__lte=datetime.datetime.strptime(
+                self.request.query_params.get('i_to_date', None), '%d-%m-%Y').date())
+
         if self.request.query_params.get('branch', None):
             print("branch")
-            queryset = queryset.filter(branch__id=self.request.query_params.get('branch', None))
+            queryset = queryset.filter(
+                branch__id=self.request.query_params.get('branch', None))
         if self.request.query_params.get('vendor', None):
             print("vendor")
-            queryset = queryset.filter(vendor__id=self.request.query_params.get('vendor', None))
+            queryset = queryset.filter(
+                vendor__id=self.request.query_params.get('vendor', None))
         if self.request.query_params.get('model', None):
             print("model")
-            queryset = queryset.filter(model_no=self.request.query_params.get('model', None))
+            queryset = queryset.filter(
+                model_no=self.request.query_params.get('model', None))
         if self.request.query_params.get('serial_num', None):
             print("serial_num")
-            queryset = queryset.filter(serial_num=self.request.query_params.get('serial_num', None))
+            queryset = queryset.filter(
+                serial_num=self.request.query_params.get('serial_num', None))
         if self.request.query_params.get('invoice_no', None):
             print("invoice_no")
-            queryset = queryset.filter(invoce_no=self.request.query_params.get('invoice_no', None))
+            queryset = queryset.filter(
+                invoce_no=self.request.query_params.get('invoice_no', None))
 
         if self.request.query_params.get('cust_code', None):
             print("cust_code")
-            queryset = queryset.filter(customer_code=self.request.query_params.get('cust_code', None))
+            queryset = queryset.filter(
+                customer_code=self.request.query_params.get('cust_code', None))
 
+        if self.request.query_params.get('stock_rpt', None) == "Y":
+            queryset = queryset.filter(invoce_no__isnull=True)
+            if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
+                print("In Month")
+                if self.request.query_params.get('stock', None) == "Y":
+                    queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
+                        'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
+                else:
+                    queryset = queryset.exclude(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
+                        'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
+            else:
+                print("In else")
+                if self.request.query_params.get('stock', None) == "Y":
+                    print("In else ---- > Y")
+                    queryset = queryset.filter(id__in=StockCheck.objects.values_list('product__id', flat=True))
+                else:
+                    queryset = queryset.exclude(id__in=StockCheck.objects.values_list('product__id', flat=True))
+            print(queryset.query)
 
         queryset = queryset.order_by('-id')
         return queryset
-    
 
     @action(detail=False, methods=['POST'])
     def transfer(self, request):
         response = {}
-        transfer_date = datetime.datetime.strptime(request.POST["transfer_date"],'%d-%m-%Y').date()
+        transfer_date = datetime.datetime.strptime(
+            request.POST["transfer_date"], '%d-%m-%Y').date()
         print(transfer_date)
         to_branch = Branch.objects.get(id=request.POST["to_branch"])
         print(to_branch)
@@ -90,20 +120,22 @@ class ProductViewSet(viewsets.ModelViewSet):
         for product_id in products:
             product = Product.objects.get(id=product_id)
             if product.branch:
-                transfer = Transfer(product=product,branch=product.branch,date=transfer_date,status="O",remark="Manual Transfer")
+                transfer = Transfer(product=product, branch=product.branch,
+                                    date=transfer_date, status="O", remark="Manual Transfer")
                 transfer.save()
-            transfer = Transfer(product=product,branch=to_branch,date=transfer_date,status="I",remark="Manual Transfer")
+            transfer = Transfer(product=product, branch=to_branch,
+                                date=transfer_date, status="I", remark="Manual Transfer")
             transfer.save()
             product.branch = to_branch
             product.save()
         response["message"] = "Transfered"
         return Response(response)
 
-        
     @action(detail=False, methods=['POST'])
     def link_invoice(self, request):
         response = {}
-        invoice_date = datetime.datetime.strptime(request.POST["invoice_date"],'%d-%m-%Y').date()
+        invoice_date = datetime.datetime.strptime(
+            request.POST["invoice_date"], '%d-%m-%Y').date()
         print(invoice_date)
         invoice_no = request.POST["invoice_no"]
         print(invoice_no)
@@ -113,8 +145,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         print(products)
         for product_id in products:
             product = Product.objects.get(id=product_id)
-            
-            transfer = Transfer(product=product,branch=product.branch,date=invoice_date,status="O",remark="{}/{}".format(invoice_no,cust_code))
+
+            transfer = Transfer(product=product, branch=product.branch, date=invoice_date,
+                                status="O", remark="{}/{}".format(invoice_no, cust_code))
             transfer.save()
             product.invoice_date = invoice_date
             product.invoce_no = invoice_no
@@ -124,26 +157,102 @@ class ProductViewSet(viewsets.ModelViewSet):
         response["message"] = "Linked"
         return Response(response)
 
+    @action(detail=False, methods=['POST'])
+    def do_stock(self, request):
+        response = {}
+        serial_num = request.POST["serial_num"]
+        model_no = request.POST["model_no"]
+        month = request.POST["month"]
+        year = request.POST["year"]
+        vendor = request.POST["vendor"]
 
+        queryset = Product.objects.filter(serial_num=serial_num)
+        if not queryset:
+            return Response({"message": "The Product is not available"}, status=status.HTTP_400_BAD_REQUEST)
+        if model_no.strip():
+            queryset = queryset.filter(model_no=model_no)
+        if vendor.strip():
+            queryset = queryset.filter(vendor__id=vendor)
 
+        count = queryset.count()
+        if count > 1:
+            return Response({"message": "There are multiple Product with the same serial number [{}], please select the Vendor or Model and scan again".format(serial_num)}, status=status.HTTP_400_BAD_REQUEST)
 
+        queryset = queryset.filter(invoce_no__isnull=True)
+        print(queryset.query)
+        if not queryset:
+            return Response({"message": "The Product is already Invoiced in the system"}, status=status.HTTP_400_BAD_REQUEST)
+
+        product = queryset.first()
+        print(product)
+        if StockCheck.objects.filter(product=product, month=month, year=year):
+            return Response({"message": "The Product is already marked for stock for the month/year [{}/{}]".format(calendar.month_name[int(month)], year)}, status=status.HTTP_400_BAD_REQUEST)
+
+        stock = StockCheck(product=product, month=month, year=year)
+        stock.save()
+
+        return Response(response)
+
+    @action(detail=False, methods=['GET'])
+    def stocks(self, request):
+        queryset = Product.objects.all()
+        queryset = queryset.filter(invoce_no__isnull=True)
+        if self.request.query_params.get('vendor', None):
+            print("vendor")
+            queryset = queryset.filter(
+                vendor__id=self.request.query_params.get('vendor', None))
+        if self.request.query_params.get('model', None):
+            print("model")
+            queryset = queryset.filter(
+                model_no=self.request.query_params.get('model', None))
+        if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
+            print("In Month")
+            if self.request.query_params.get('stock', None) == "Y":
+                queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
+                    'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
+            else:
+                queryset = queryset.exclude(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
+                    'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
+        else:
+            print("In else")
+            if self.request.query_params.get('stock', None) == "Y":
+                print("In else ---- > Y")
+                queryset = queryset.filter(id__in=StockCheck.objects.values_list('product__id', flat=True))
+            else:
+                queryset = queryset.exclude(id__in=StockCheck.objects.values_list('product__id', flat=True))
+        print(queryset.query)
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ProductAggViewSet(viewsets.ModelViewSet):
-    serializer_class=ProductAggSerializer
+    serializer_class = ProductAggSerializer
     queryset = Product.objects.all()
 
     def get_queryset(self):
         if self.request.query_params.get('uninvoiced', None):
-            return Product.objects.filter(invoce_no__isnull=True).values('vendor','model_no').annotate(cnt=Count('id')).values('vendor__name','vendor__code','model_no','cnt')
-        
-        if self.request.query_params.get('untransfered', None):
-            return Product.objects.filter(branch__isnull=True).values('vendor','model_no').annotate(cnt=Count('id')).values('vendor__name','vendor__code','model_no','cnt')
+            return Product.objects.filter(invoce_no__isnull=True).values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
 
-        return Product.objects.values('vendor','model_no').annotate(cnt=Count('id')).values('vendor__name','vendor__code','model_no','cnt')
+        if self.request.query_params.get('untransfered', None):
+            return Product.objects.filter(branch__isnull=True).values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+
+        return Product.objects.values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
 
 
 class TransferViewSet(viewsets.ModelViewSet):
-    serializer_class=TrasferSerializer
+    serializer_class = TrasferSerializer
     queryset = Transfer.objects.all().order_by('-event_time')
 
+
+class StockCheckViewSet(viewsets.ModelViewSet):
+    serializer_class = StockCheckSerializer
+    queryset = StockCheck.objects.all().order_by('-event_time')
+
+    def get_queryset(self):
+        queryset = StockCheck.objects.all()
+
+        if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
+            queryset = queryset.filter(month=self.request.query_params.get(
+                'month', None), year=self.request.query_params.get('year', None))
+        queryset = queryset.order_by('-event_time')
+        return queryset
