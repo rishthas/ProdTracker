@@ -10,7 +10,9 @@ from datetime import datetime
 
 # Create your views here.
 def index(request):
-    return render(request,'product/index.html')
+    this_month = datetime.today().strftime("%b-%Y")
+    
+    return render(request,'product/index.html',{"this_month":this_month})
 
 
 def branch(request):
@@ -64,7 +66,7 @@ def purchase(request):
     branch = Branch.objects.all()
     vendor = Vendor.objects.all()
 
-    return render(request,'product/purchase.html',{'branchs':branch,'vendors':vendor})
+    return render(request,'product/purchase.html',{'branches':branch,'vendors':vendor})
 
 def transfer(request):
     branches = Branch.objects.all()

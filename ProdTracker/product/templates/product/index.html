@@ -80,11 +80,37 @@
   <div class="col-md-6">
     <div class="card">
       <div class="card-header text-center bg-gradient-danger">
-        <h3 class="card-title text-center">Product Counts - Not Transfered</h3>
+        <h3 class="card-title text-center">Discrepancies in stock purchased before [{{this_month}}]</h3>
       </div>
       <!-- /.card-header -->
       <div class="card-body">
         <table id="agg_table3" class="table table-bordered table-striped table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th>Vendor Name</th>
+              <th>Vendor Code</th>
+              <th>Model No</th>
+              <th>Count</th>
+
+
+            </tr>
+          </thead>
+          <tbody>
+          <tbody>
+
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header text-center bg-gradient-danger">
+        <h3 class="card-title text-center">Discrepancies in stock purchased in the month [{{this_month}}]</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table id="agg_table4" class="table table-bordered table-striped table-sm">
           <thead class="thead-dark">
             <tr>
               <th>Vendor Name</th>
@@ -179,7 +205,7 @@
 
               $.ajax({
                 type: "GET",
-                url: "/api/product_agg/?untransfered=Y",
+                url: "/api/product_agg/?unstocked=Y&lastmonth=Y",
                 success: function (response) {
                   console.log(response.results)
                   $("#agg_table3 tbody td").remove();
@@ -194,12 +220,41 @@
 
                   });
                   if(response.results.length == 0){
-                    var content="<tr><td colspan='4' class='text-center'>All Products are invoiced</td></tr>"
+                    var content="<tr><td colspan='4' class='text-center'>No Descripency in Product stock</td></tr>"
                     $("#agg_table3").append(content);
                   }
                   var footer_content = "<tfoot><tr><td colspan='3' class='text-center text-bold'>Total</td><td class='text-center text-bold'>"+ cnt + "</td></tr></tfoot>"
 
                   $("#agg_table3").append(footer_content);
+
+
+                  console.log("finish")
+                }
+              });
+
+              $.ajax({
+                type: "GET",
+                url: "/api/product_agg/?unstocked=Y&thismonth=Y",
+                success: function (response) {
+                  console.log(response.results)
+                  $("#agg_table4 tbody td").remove();
+                  $("#agg_table4 tfoot td").remove();
+                  var cnt=0;
+                  
+                  $.each(response.results, function (indexInArray, row) { 
+                      var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
+                    //  console.log(content)
+                    $("#agg_table4").append(content);
+                    cnt = cnt + parseInt(row.cnt)
+
+                  });
+                  if(response.results.length == 0){
+                    var content="<tr><td colspan='4' class='text-center'>No Descripency in Product stock</td></tr>"
+                    $("#agg_table4").append(content);
+                  }
+                  var footer_content = "<tfoot><tr><td colspan='3' class='text-center text-bold'>Total</td><td class='text-center text-bold'>"+ cnt + "</td></tr></tfoot>"
+
+                  $("#agg_table4").append(footer_content);
 
 
                   console.log("finish")

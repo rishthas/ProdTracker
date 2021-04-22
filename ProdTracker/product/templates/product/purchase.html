@@ -60,9 +60,9 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body">
+  <div class="card-body bg-gradient-gray">
     <div class="row">
-      <div class="col-md-4 p-3">
+      <div class="col-md-4">
         <div class="form-group">
           <label> Purchase Date:</label>
             <div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -73,7 +73,7 @@
             </div>
         </div>
       </div>
-      <div class="col-md-4 p-3">
+      <div class="col-md-4">
         <div class="form-group">
           <label>Vendor</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
@@ -87,7 +87,7 @@
           </select>
         </div>
       </div>
-      <div class="col-md-4 p-3">
+      <div class="col-md-4">
 
         <div class="form-group">
           <label>Model</label>
@@ -96,7 +96,21 @@
       </div>
     </div>
     <div class="row justify-content-center" >
-      <div class="col-md-6 p-3">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>To Branch</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="to_branch">
+            <option value=""></option>
+
+            {% for branch in branches %}
+              <option value="{{branch.id}}">{{branch.code}}/{{branch.name}}</option>
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
          <div class="form-group">
           <label>Serial Number</label>
           <input type="text" class="form-control " placeholder="Serial Number" id="serial_num">
@@ -184,7 +198,7 @@
     <script>
         $(document).ready(function () {
           var barcode="";
-          function purchase(barcode) {
+          function purchase() {
             serial_num = barcode;
             if($.trim($("#purchase_date").val()) == ""){
               alert("Purchase Date Cannot be null");
@@ -201,14 +215,24 @@
               $("#model").focus();
               return false
             }
+            if ($("#to_branch").val() == "") {
+              alert("Please select To Branch and read the barcode Again");
+              $("#serial_num").val("");
+              $("#to_branch").focus();
+              
+              barcode="";
+              return false;
+            }
             vendor = $.trim($("#vendor").val());
             model_no=$.trim($("#model").val());
             purchase_date = $.trim($("#purchase_date").val());
+            branch = $("#to_branch").val();
             data = {
                 "serial_num": serial_num,
                 "model_no": model_no,
                 "purchase_date": purchase_date,
-                "vendor": vendor
+                "vendor": vendor,
+                "branch":branch
             };
             $.ajax({
               headers: { "X-CSRFToken": csrf_token },
@@ -239,14 +263,14 @@
             var code = (e.keyCode ? e.keyCode : e.which);
             if(code==13)// Enter key hit
             {
-                if(purchase(barcode)){
+                if(purchase()){
                   barcode=""; 
                   $("#serial_num").val("");
                 }           
             }
             else if(code==9)// Tab key hit
             {
-              if(purchase(barcode)){
+              if(purchase()){
                   barcode=""; 
                   $("#serial_num").val("");
                 }            

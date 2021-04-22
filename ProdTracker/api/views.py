@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from product.models import Branch, Vendor, Product, Transfer, StockCheck
 from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer, StockCheckSerializer
-from django.db.models import Count
+from django.db.models import Count,Q
 import datetime
 import calendar
 from rest_framework.decorators import action
@@ -89,6 +89,10 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(invoce_no__isnull=True)
             if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
                 print("In Month")
+                ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
+                print(ref_date)
+                queryset = queryset.filter(purchase_date__lt=ref_date)
+
                 if self.request.query_params.get('stock', None) == "Y":
                     queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
                         'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
@@ -207,6 +211,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 model_no=self.request.query_params.get('model', None))
         if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
             print("In Month")
+            ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
+            print(ref_date)
             if self.request.query_params.get('stock', None) == "Y":
                 queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
                     'month', None), year=self.request.query_params.get('year', None)).values_list('product__id', flat=True))
@@ -235,7 +241,15 @@ class ProductAggViewSet(viewsets.ModelViewSet):
 
         if self.request.query_params.get('untransfered', None):
             return Product.objects.filter(branch__isnull=True).values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+        
+        if self.request.query_params.get('unstocked', None):
+            if self.request.query_params.get('lastmonth', None):
+                first_day_of_this_month = datetime.date.today().replace(day=1)
 
+                return Product.objects.filter(invoce_no__isnull=True,purchase_date__lt=first_day_of_this_month).values('vendor', 'model_no').exclude(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+            if self.request.query_params.get('thismonth', None):
+                first_day_of_this_month = datetime.date.today().replace(day=1)
+                return Product.objects.filter(invoce_no__isnull=True,purchase_date__gte=first_day_of_this_month).values('vendor', 'model_no').exclude(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
         return Product.objects.values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
 
 
