@@ -1,0 +1,92 @@
+{% extends "product/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %} {% trans "Add Club" %} {% endblock head_title %}<
+
+{% block heading %} {% trans "Add Club" %}{% endblock heading %}
+
+ {% block breadcrums %}
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        
+    </ol>
+{% endblock breadcrums %}
+
+{% block maincontent %}
+<div class="card">
+    <div class="card-header pl-7 bg-gradient-dark">
+        <h2> Add Club</h2>
+
+    </div>
+    <div class="card-body">
+            {% if messages %}
+            
+                {% for message in messages %}
+                {% comment %} <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> {% endcomment %}
+                    {% if 'add_club' in message.tags %}
+                        <div class="alert alert-custom alert-primary" role="alert">
+                            <div class="alert-icon">
+                                <div class="alert-text"><i class="fa fa-check-circle"></i>  {% if message.tags %}{{ message.tags|title}}{% endif %} : {{ message }}!</div>                    
+                            </div>
+                            
+                        </div>
+                    {% endif %}
+                    
+                {% endfor %}
+        
+        
+            {% endif %}
+        
+        <form method="post" >
+            {% csrf_token %}
+            {% if form.errors %}
+
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-ban"></i> {% trans "Error!" %}</h5>
+
+                <p>{% trans "There were some errors in the information you entered. Please correct the following:" %}</p>
+                {{ form.non_field_errors }}
+                <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+                </ul>
+
+
+
+
+            </div>
+            <!-- /Error messaging -->
+            <div class="separator separator-dashed my-8"></div>
+            {% endif %}
+            <div class="form-group">
+                <label for="exampleInputEmail1">User Name</label>
+                {{form.username}}
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">First Name</label>
+                {{form.first_name}}
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Last Name</label>
+                {{form.last_name}}
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email</label>
+                {{form.email}}
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Role id</label>
+                {{form.role_id}}
+            </div>
+            <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
+
+        </form>
+            
+            
+        
+    </div>
+</div>
+{% endblock maincontent%}

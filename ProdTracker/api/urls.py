@@ -1,6 +1,6 @@
 from django.urls import path,include
 from rest_framework import routers
-from .views import BranchViewSet,VendorViewSet,ProductViewSet,TransferViewSet,ProductAggViewSet,StockCheckViewSet
+from .views import BranchViewSet,VendorViewSet,ProductViewSet,TransferViewSet,ProductAggViewSet,StockCheckViewSet,UserViewSet,RoleViewSet,ModelViewSet
 
 router = routers.DefaultRouter()
 router.register('branch',BranchViewSet)
@@ -9,6 +9,10 @@ router.register('product',ProductViewSet)
 router.register('transfer',TransferViewSet)
 router.register('product_agg',ProductAggViewSet)
 router.register('stock_check',StockCheckViewSet)
+router.register('user',UserViewSet)
+router.register('roles',RoleViewSet)
+router.register('model',ModelViewSet)
+
 
 
 

@@ -1,0 +1,91 @@
+
+{% extends "registration/base.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+
+{% block head_title %} {% trans "Login" %}{% endblock %}
+
+{% block content %}
+  <div class="login-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline card-dark">
+      <div class="card-header text-center">
+        <img src="{% static 'dist/img/aims_logo.png' %}" alt="IMG" width="30%"> <br>
+        <a href="/" class="h1"><b>{% trans "Product Tracker" %}</b></a>
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg">{% trans "Sign in to start your session" %}</p>
+        {% if form.errors %}
+
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-ban"></i> {% trans "Error!" %}</h5>
+
+                
+                {{ form.non_field_errors }}
+                <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+                </ul>
+
+
+
+
+            </div>
+            <!-- /Error messaging -->
+            <div class="separator separator-dashed my-8"></div>
+            {% endif %}
+        <form action="" method="post">
+          {% csrf_token %}
+          {% comment %} {{form.as_p}} {% endcomment %}
+          <div class="input-group mb-3">
+            <!-- <input type="email" class="form-control" placeholder="Email"> -->
+            {{form.username|add_class:'form-control' }}
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <!-- <input type="password" class="form-control" placeholder="Password"> -->
+            {{form.password |add_class:'form-control' }}
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="icheck-primary">
+                <input type="checkbox" id="remember">
+                <label for="remember">
+                  {% trans "Remember Me" %}
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-6">
+              <button type="submit" class="btn btn-primary btn-block">{% trans "Sign In" %}</button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+        <hr>
+        
+        <!-- /.social-auth-links -->
+  
+        
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  
+  
+{% endblock %}
+

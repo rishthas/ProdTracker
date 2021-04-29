@@ -1,0 +1,447 @@
+{% extends "product/base.html" %}
+{% load static %}
+
+{% load i18n %}
+
+{% block head_title %} {% trans "Edit Roles" %} {% endblock head_title %}<
+
+{% block heading %} {% trans "Edit Roles" %}{% endblock heading %}
+{% block pagecss %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css' %}">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}">
+  <!-- BS Stepper -->
+  <link rel="stylesheet" href="{% static 'plugins/bs-stepper/css/bs-stepper.min.css' %}">
+  <!-- dropzonejs -->
+  <link rel="stylesheet" href="{% static 'plugins/dropzone/min/dropzone.min.css' %}">
+   <link rel="stylesheet" href="{% static 'plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/sweetalert2/sweetalert2.min.css' %}">
+  <style>
+    #overlay {
+        background: #ffffff;
+        color: #666666;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        z-index: 5000;
+        top: 0;
+        left: 0;
+        float: left;
+        text-align: center;
+        padding-top: 25%;
+        opacity: .80;
+      }
+      button {
+        margin: 40px;
+        padding: 5px 20px;
+        cursor: pointer;
+      }
+      .spinner {
+          margin: 0 auto;
+          height: 64px;
+          width: 64px;
+          animation: rotate 0.8s infinite linear;
+          border: 5px solid firebrick;
+          border-right-color: transparent;
+          border-radius: 50%;
+      }
+      @keyframes rotate {
+          0% {
+              transform: rotate(0deg);
+          }
+          100% {
+              transform: rotate(360deg);
+          }
+      }
+  </style>
+{% endblock pagecss %}
+
+ {% block breadcrums %}
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="#">{% trans "Edit Role" %}</a></li>
+        
+    </ol>
+{% endblock breadcrums %}
+
+{% block maincontent %}
+<div class="card">
+    <div class="card-header pl-7 bg-gradient-dark">
+      <div class="row">
+       <div class="col-12">
+        <h2> {% trans "Edit Role" %}</h2>
+       </div>
+       
+       
+      </div>
+        
+        
+
+    </div>
+    <div class="card-body">
+        {% if messages %}
+        
+            {% for message in messages %}
+            {% comment %} <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> {% endcomment %}
+                {% if 'add_club' in message.tags %}
+                    <div class="alert alert-custom alert-primary" role="alert">
+                        <div class="alert-icon">
+                            <div class="alert-text"><i class="fa fa-check-circle"></i>  {% if message.tags %}{{ message.tags|title}}{% endif %} : {{ message }}!</div>                    
+                        </div>
+                        
+                    </div>
+                {% endif %}
+                
+            {% endfor %}
+
+    
+        {% endif %}
+        
+        <form action="" method="post">
+          <div class="row">
+            <div class="col-sm-6">
+              <!-- text input -->
+              <div class="form-group">
+                <label>{% trans "Role ID" %}</label>
+                <input type="text" class="form-control" id="id_role_id" placeholder="{% trans "Enter the Role ID" %}" value="{{role.role_id}}" readonly>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <!-- text input -->
+              <div class="form-group">
+                <label>{% trans "Role Description" %}</label>
+                <input type="text" class="form-control" id="id_role_desc" placeholder="{% trans "Enter the Role Description" %}" value="{{role.description}}">
+              </div>
+            </div>
+            
+            
+          </div>
+          <table id="access_matrix" class="table table-bordered table-sm">
+            <thead class="bg-gradient-dark">
+            <tr>
+              
+              <th class="text-center">{% trans "Description" %}</th>
+              <th class="text-center">  {% trans "Access Identifier" %}</th>
+
+              
+              
+
+            </tr>
+            </thead>
+            <tbody>
+              {% for menu in  menu_settings%} 
+
+              {% if menu.access_level != "admin" %}
+                {% if menu.has_sub %}
+                  <tr>
+                    <td colspan="2" class="text-center text-bold bg-gray-light">{{menu.description}}</td>
+                  </tr>
+                  {% for secondlevel in menu.submenu %}
+                    {% if secondlevel.access_level != "admin" %}
+                      {% if secondlevel.has_sub %}
+                        <tr>
+                          <td colspan="2" class="text-center text-bold">{{secondlevel.description}}</td>
+                        </tr>
+                        {% for thirdlevel in secondlevel.submenu %}
+                          {% if thirdlevel.access_level != "admin" %}
+                            {% if thirdlevel.has_sub %}
+                              <tr>
+                              <td colspan="2" class="text-center text-bold">{{secondlevel.description}}</td>
+                                {% for thirdlevel in secondlevel.submenu %}
+                                {% endfor %}
+
+                            </tr>
+                            {% else %}
+                              <tr>
+                                <td>{{thirdlevel.description}}</td>
+                                <td>
+                                  <div class="row justify-content-center p-0 m-0">
+                                    
+                                    
+                                    {% for access in thirdlevel.access_type %}
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                          <input type="checkbox" class="custom-control-input" id="{{thirdlevel.ref}}_{{access.type}}"  data-access-ref="{{thirdlevel.ref}}" data-access-type="{{access.type}}"
+                                            {% for role_access in role.role_access.all %}
+                                              {% if thirdlevel.ref == role_access.access_point  %}
+                                                {% if access.type ==  role_access.access_string %}
+                                                  checked
+                                                {% endif %}
+                                              {% endif %}
+                                            {% endfor %}
+                                          >
+                                          <label class="custom-control-label" for="{{thirdlevel.ref}}_{{access.type}}">{{access.desc}}</label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {% endfor %}
+                                  </div>
+                                </td>
+                              </tr>
+                            {% endif %}
+
+                          {% endif %}
+                        {% endfor %}
+
+
+                      {% else %}
+                        <tr>
+                          <td>{{secondlevel.description}}</td>
+                          <td>
+                          <div class="row justify-content-center p-0 m-0">
+                            {% for access in secondlevel.access_type %}
+                             <div class="col-md-3">
+                              <div class="form-group">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                  <input type="checkbox" class="custom-control-input" id="{{secondlevel.ref}}_{{access.type}}"  data-access-ref="{{secondlevel.ref}}" data-access-type="{{access.type}}"
+                                  {% for role_access in role.role_access.all %}
+                                    {% if secondlevel.ref == role_access.access_point  %}
+                                      {% if access.type ==  role_access.access_string %}
+                                        checked
+                                      {% endif %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  >
+                                  <label class="custom-control-label" for="{{secondlevel.ref}}_{{access.type}}">{{access.desc}}</label>
+                                </div>
+                              </div>
+                            </div>
+                            {% endfor %}
+                          </div>
+                          </td>
+                        </tr>
+
+
+                      {% endif %}
+
+                    {% endif %}
+                  
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td>{{menu.description}}</td>
+                    <td>
+                    <div class="row justify-content-center p-0 m-0">
+                    {% for access in menu.access_type %}
+                      <div class="form-group">
+                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                          <input type="checkbox" class="custom-control-input" id="{{menu.ref}}_{{access.type}}" data-access-ref="{{menu.ref}}" data-access-type="{{access.type}}"
+                          {% for role_access in role.role_access.all %}
+                            {% if menu.ref == role_access.access_point  %}
+                              {% if access.type ==  role_access.access_string %}
+                                checked
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                          >
+                          <label class="custom-control-label" for="{{menu.ref}}_{{access.type}}">{{access.desc}}</label>
+                        </div>
+                      </div>
+                    {% endfor %}
+                    
+                    
+                    </td>
+                  </tr>
+
+                {% endif %}
+
+              {% endif %}
+              
+              {% endfor %}
+            </tbody>
+            
+            
+          </table>
+          <div class="row justify-content-center">
+            
+              <button type="button" class="btn btn-primary" id="id_submit">{% trans "Submit" %}</button>
+
+            
+          </div>
+        </form>
+            
+            
+        
+    </div>
+</div>
+<div id="overlay" style="display:none;">
+  <div class="spinner"></div>
+  <br/>
+  <h2>{% trans "Please Wait while System save the Roles..." %}</h2>
+</div>
+{% endblock maincontent%}
+
+
+{% block pagejs %}
+    <script>var csrf_token = '{{csrf_token}}';</script>
+
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <!-- Select2 -->
+    <script src="{% static 'plugins/select2/js/select2.full.min.js' %}"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="{% static 'plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js' %}"></script>
+    <!-- InputMask -->
+    <script src="{% static 'plugins/moment/moment.min.js' %}"></script>
+    <script src="{% static 'plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+    <!-- date-range-picker -->
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <!-- bootstrap color picker -->
+    <script src="{% static 'plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <!-- Bootstrap Switch -->
+    <script src="{% static 'plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}"></script>
+    <!-- BS-Stepper -->
+    <script src="{% static 'plugins/bs-stepper/js/bs-stepper.min.js' %}"></script>
+    <!-- dropzonejs -->
+    <script src="{% static 'plugins/dropzone/min/dropzone.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- SweetAlert2 -->
+    <script src="{% static 'plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+    <!-- Toastr -->
+    <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+    <script src="{% static 'plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+       
+          $('#id_role_id').keypress(function (e) { 
+            if(e.which === 32) 
+              return false;
+          });
+          $("#id_submit").click(function (e) { 
+            $('#overlay').fadeIn();
+
+            if ($.trim($("#id_role_id").val()) == "") {
+              $('#overlay').fadeOut();
+              Swal.fire({
+                title: '{% trans "Error!!" %}',
+                text: '{% trans "Please enter the Role id!!!" %}',
+                icon: 'error',
+                confirmButtonText: '{% trans "OK" %}',
+                didClose: () => {
+                    console.log("in");
+                    $("#id_role_id").focus();
+                    return false;
+
+                  }
+              });
+              return false;
+              
+            }
+            console.log($("#id_role_id").val().indexOf(' '));
+            if($("#id_role_id").val().indexOf(' ') > 0){
+              $('#overlay').fadeOut();
+              console.log("INnnnn");
+              Swal.fire({
+                title: '{% trans "Error!!" %}',
+                text: '{% trans "Please enter the Role id with out space!!!" %}',
+                icon: 'error',
+                confirmButtonText: '{% trans "OK" %}',
+                didClose: () => {
+                    console.log("in");
+                    $("#id_role_id").focus();
+                    return false;
+                  }
+              });
+              return false;
+            }
+            if ($.trim($("#id_role_desc").val()) == "") {
+              $('#overlay').fadeOut();
+              Swal.fire({
+                title: '{% trans "Error!!" %}',
+                text: '{% trans "Please enter the Role Description!!!" %}',
+                icon: 'error',
+                confirmButtonText: '{% trans "OK" %}',
+                didClose: () => {
+                    console.log("in");
+                    $("#id_role_desc").focus();
+                    return false;
+
+                  }
+              });
+              return false;
+            }
+            var access_matrix = []
+            $("#access_matrix").find('input[type="checkbox"]:checked').each(function () { 
+              console.log($(this).data("access-ref"));
+              console.log($(this).data("access-type"));
+              access_matrix.push(JSON.stringify({"access_ref":$(this).data("access-ref"),"access_type":$(this).data("access-type")}))
+              
+
+             });
+             var ajax_data = {"role_id":$.trim($("#id_role_id").val()),"role_desc":$.trim($("#id_role_desc").val()),"access_matrix":access_matrix}
+             console.log(ajax_data)
+
+             $.ajax({
+                headers: { "X-CSRFToken": csrf_token },
+                type: "POST",
+                url: "/api/roles/editrole/",
+                data: ajax_data,
+                success: function (response) {
+                  console.log(response)
+                  $('#overlay').fadeOut();
+                  Swal.fire(
+                    "{% trans "Success" %}!",
+                    response.message,
+                    "success",
+                    
+                  ).then(function(result){
+                    {% comment %} alert(result.value); {% endcomment %}
+                    $(location).attr('href', "{% url 'roles' %}")
+                    }
+						      );
+                 
+               },
+               error: function(xhr,status,error,){
+                console.log("In Error");
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                  $('#overlay').fadeOut();
+
+                Swal.fire(
+                    "{% trans "Error" %}!",
+                    xhr.responseJSON["message"],
+                    "error"
+                  );
+               }
+             });
+
+
+
+
+            
+          });
+            
+            
+        });
+    </script>
+{% endblock pagejs %}

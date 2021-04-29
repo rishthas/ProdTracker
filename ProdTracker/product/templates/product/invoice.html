@@ -4,9 +4,9 @@
 
 {% load static %}
 
-{% block head_title %} {% trans "Product Transfer" %} {% endblock head_title %}<
+{% block head_title %} {% trans "Link Invoice" %} {% endblock head_title %}<
 
-{% block heading %} {% trans "Product Transfer" %}{% endblock heading %}
+{% block heading %} {% trans "Link Invoice" %}{% endblock heading %}
 
 {% block pagecss %}
     <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
@@ -88,7 +88,7 @@
  {% block breadcrums %}
     <ol class="breadcrumb float-sm-right">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'branch' %}">{% trans "Product Transfer" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'invoice' %}">{% trans "Link Invoice" %}</a></li>
         
     </ol>
 {% endblock breadcrums %}
@@ -111,7 +111,7 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body bg-gradient-gray">
+  <div class="card-body bg-gradient-dark">
     <div class="row">
       <div class="col-md-4 p-3">
         <div class="form-group">
@@ -391,9 +391,9 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
               columns: [
                 { data: 'Action', "searchable": false, "bSortable": false },
                 { data: 'id' },
-                { data: 'vendor.code' },
-                { data: 'vendor.name' },
-                { data: 'model_no' },
+                { data: 'model.vendor.code' },
+                { data: 'model.vendor.name' },
+                { data: 'model.name' },
                 { data: 'serial_num' },
                 { data: 'branch.name' },
               ],
@@ -501,9 +501,9 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 columns: [
                   { data: 'Action', "searchable": false, "bSortable": false },
                   { data: 'id' },
-                  { data: 'vendor.code' },
-                  { data: 'vendor.name' },
-                  { data: 'model_no' },
+                  { data: 'model.vendor.code' },
+                  { data: 'model.vendor.name' },
+                  { data: 'model.name' },
                   { data: 'serial_num' },
                   { data: 'branch.name' },
                 ],

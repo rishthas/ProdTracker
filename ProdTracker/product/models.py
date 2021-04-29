@@ -26,14 +26,25 @@ class Vendor(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("Vendor_detail", kwargs={"pk": self.pk})
+
+class Model(models.Model):
+    name = models.CharField(_("Vendor Name"), max_length=50)
+    vendor = models.ForeignKey(Vendor, verbose_name=_("Vendor"), on_delete=models.CASCADE,related_name='vendor')
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Model'
+        verbose_name_plural = 'Models'
   
 
 class Product(models.Model):
     serial_num = models.CharField(_("Serial Number"), max_length=200)
-    vendor = models.ForeignKey(Vendor, verbose_name=_("Vendor"), on_delete=models.CASCADE)
-    model_no = models.CharField(_("Model No"), max_length=50) 
+    # vendor = models.ForeignKey(Vendor, verbose_name=_("Vendor"), on_delete=models.CASCADE)
+    # model_no = models.CharField(_("Model No"), max_length=50) 
+    model = models.ForeignKey(Model, verbose_name=_("Model"), on_delete=models.CASCADE)
     purchase_date = models.DateField(_("Purchase Date"), auto_now=False, auto_now_add=False)   
     branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.SET_NULL,null=True,blank=True)
     invoice_date = models.DateField(_("Invoice Date"),null=True,blank=True)
@@ -43,7 +54,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
-        unique_together=('vendor','model_no','serial_num')
+        unique_together=('model','serial_num')
 
     def __str__(self):
         return self.serial_num

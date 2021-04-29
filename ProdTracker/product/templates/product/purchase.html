@@ -60,7 +60,7 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body bg-gradient-gray">
+  <div class="card-body bg-gradient-dark">
     <div class="row">
       <div class="col-md-4">
         <div class="form-group">
@@ -75,12 +75,12 @@
       </div>
       <div class="col-md-4">
         <div class="form-group">
-          <label>Vendor</label>
-          <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
+          <label>Vendor Code / Vendor Name / Model</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="model">
             <option value=""></option>
 
-            {% for vendor in vendors %}
-              <option value="{{vendor.id}}">{{vendor.code}}/{{vendor.name}}</option>
+            {% for model in models %}
+              <option value="{{model.id}}">{{model.vendor.code}}/{{model.vendor.name}}/{{model.name}}</option>
 
             {% endfor %}
             
@@ -89,14 +89,6 @@
       </div>
       <div class="col-md-4">
 
-        <div class="form-group">
-          <label>Model</label>
-          <input type="text" class="form-control " placeholder="Model" id="model">
-        </div>
-      </div>
-    </div>
-    <div class="row justify-content-center" >
-      <div class="col-md-6">
         <div class="form-group">
           <label>To Branch</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="to_branch">
@@ -110,6 +102,9 @@
           </select>
         </div>
       </div>
+    </div>
+    <div class="row justify-content-center" >
+      
       <div class="col-md-6">
          <div class="form-group">
           <label>Serial Number</label>
@@ -205,11 +200,7 @@
               $("#purchase_date").focus();
               return false
             }
-            if($.trim($("#vendor").val()) == ""){
-              alert("Please select a Vendor");
-              $("#vendor").focus();
-              return false
-            }
+            
             if($.trim($("#model").val()) == ""){
               alert("Please enter the Model Number");
               $("#model").focus();
@@ -223,15 +214,14 @@
               barcode="";
               return false;
             }
-            vendor = $.trim($("#vendor").val());
+            
             model_no=$.trim($("#model").val());
             purchase_date = $.trim($("#purchase_date").val());
             branch = $("#to_branch").val();
             data = {
                 "serial_num": serial_num,
-                "model_no": model_no,
+                "model": model_no,
                 "purchase_date": purchase_date,
-                "vendor": vendor,
                 "branch":branch
             };
             $.ajax({
@@ -302,9 +292,9 @@
                 columns: [
                   { data: 'id' },
                   { data: 'purchase_date' },
-                  { data: 'vendor.code' },
-                  { data: 'vendor.name' },
-                  { data: 'model_no' },
+                  { data: 'model.vendor.code' },
+                  { data: 'model.vendor.name' },
+                  { data: 'model.name' },
                   { data: 'serial_num' },
                   
                   { data: 'branch.name' },

@@ -41,12 +41,16 @@
 <div class="card">
               <div class="card-header">
                 <h3 class="card-title">List of Vendors</h3>
+                {% if 'add' in access_type %}
+
                 <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto float-right">
                   <li class="nav-item">
                             
                             <a href="{% url 'add-vendor' %}" class="nav-link"> <i class="fas fa-plus-circle"></i> {% trans "Add Vendor" %}</a>
                         </li>
                 </ul>
+                {% endif %}
+
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -87,7 +91,11 @@
     <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
     <script>
         $(document).ready(function () {
+          var access_modify = "{% if 'modify' in access_type %}true{% else %}false{% endif %}";
+          var access_delete = "{% if 'delete' in access_type %}true{% else %}false{% endif %}";
+
           var datatable = $("#example1").DataTable({
+
                 "responsive": true,
                 "lengthChange": true,
                 "processing": true,
@@ -103,13 +111,18 @@
                     "render": function(data,type,full,meta){
                       console.log(full)
                       var rtn_str = "";
+                       if(access_modify == "true"){
                       rtn_str = rtn_str + '<a dataId="'+ full.id + '"  class="terminal-edit"  href="/vendor/edit/'+ full.id +'/" title="Edit Vendor">\
 							          <i class="fas fa-edit text-primary"></i>\
-                        </a>\
-                        <a dataId="'+ full.id + '" dataName="' + full.name + '" class="vendor-delete" title="Delete">\
+                        </a>';
+                      }
+                      if(access_delete == "true"){
+
+                        rtn_str = rtn_str + '<a dataId="'+ full.id + '" dataName="' + full.name + '" class="vendor-delete" title="Delete">\
                           <i class="fas fa-trash text-danger"></i>\
                         </a>\
                         ';
+                      }
                       return rtn_str;
 
                     },

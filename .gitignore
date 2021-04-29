@@ -75,3 +75,5 @@ dmypy.json
 
 #For the Project
 ProdTrackerEnv/
+.vscode/settings.json
+ProdTracker/db_safe.sqlite3

@@ -61,8 +61,8 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body">
-    <div class="row">
+  <div class="card-body bg-gradient-dark">
+    <div class="row justify-content-center">
       <div class="col-md-3">
         <div class="form-group">
           <label>Month</label>
@@ -93,27 +93,21 @@
         </div>
       </div>
     
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group">
-          <label>Vendor</label>
-          <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
+          <label>Vendor/Model</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="model">
             <option value="">No Selected</option>
             
-            {% for vendor in vendors %}
-              <option value="{{vendor.id}}">{{vendor.code}}/{{vendor.name}}</option>
+            {% for model in models %}
+              <option value="{{model.id}}">{{model.vendor.code}}/{{model.vendor.name}}/{{model.name}}</option>
 
             {% endfor %}
             
           </select>
         </div>
       </div>
-      <div class="col-md-3">
-
-        <div class="form-group">
-          <label>Model</label>
-          <input type="text" class="form-control " placeholder="Model" id="model">
-        </div>
-      </div>
+      
     </div>
     <div class="row justify-content-center" >
       <div class="col-md-6 p-3">
@@ -206,15 +200,13 @@
             serial_num = $("#serial_num").val();
             
             
-            vendor = $.trim($("#vendor").val());
-            model_no=$.trim($("#model").val());
+            model=$.trim($("#model").val());
             purchase_date = $.trim($("#purchase_date").val());
             data = {
                 "serial_num": serial_num,
-                "model_no": model_no,
+                "model": model,
                 "month": $("#month").val(),
                 "year": $("#year").val(),
-                "vendor": vendor
             };
             $.ajax({
               headers: { "X-CSRFToken": csrf_token },
@@ -249,9 +241,8 @@
                 if(purchase(barcode)){
                   barcode=""; 
                   $("#serial_num").val("");
-                  $("#vendor").val("");
-                  $('#vendor').trigger('change');
                   $("#model").val("");
+                  $('#model').trigger('change');
                 }           
             }
             else if(code==9)// Tab key hit
@@ -259,9 +250,8 @@
               if(purchase(barcode)){
                   barcode=""; 
                   $("#serial_num").val("");
-                  $("#vendor").val("");
-                  $('#vendor').trigger('change');
                   $("#model").val("");
+                  $('#model').trigger('change');
                 }            
 
             }
@@ -291,9 +281,9 @@
                 columns: [
                   { data: 'month_str' ,"searchable": false,"orderable": false,},
                   { data: 'year'},
-                  { data: 'product.vendor.code' },
-                  { data: 'product.vendor.name' },
-                  { data: 'product.model_no' },
+                  { data: 'product.model.vendor.code' },
+                  { data: 'product.model.vendor.name' },
+                  { data: 'product.model.name' },
                   { data: 'product.serial_num' },
                   
                 ]

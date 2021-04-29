@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load menu_generator%}
 
 <!DOCTYPE html>
 <!--
@@ -35,69 +36,107 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <span class="brand-text font-font-weight-bold">{% trans "AIMS Product Tracker" %}</span>
                 </a>
 
-                <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
+                <!-- <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
                     data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
                     aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-                </button>
+                </button> -->
 
+                {% get_menu "ADMIN_MENU" as admin_menu %}
+                {% comment %} {{left_menu}} {% endcomment %}
                 <div class="collapse navbar-collapse order-3" id="navbarCollapse">
                     <!-- Left navbar links -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             
-                            <a href="{% url 'home' %}" class="nav-link"> <i class="fas fa-home"></i> {% trans "Home" %}</a>
+                            <a href="{% url 'home' %}" class="nav-link"> {% trans "Home" %}</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false" class="nav-link dropdown-toggle">Product</a>
-                            <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                                <li><a href="{% url 'purchase' %}" class="dropdown-item">Purchase</a></li>
-                                <li><a href="{% url 'transfer' %}" class="dropdown-item">Transfer</a></li>
-                                <li><a href="{% url 'invoice' %}" class="dropdown-item">Link Invoice</a></li>
+                        {% for firstlevel in admin_menu%}
+                            <li class="nav-item {% if firstlevel.submenu %} dropdown {% endif %}">
+                                <a {% if firstlevel.submenu %} id="dropdown{{firstlevel.ref}}"{% endif %}  href="{% if firstlevel.submenu %} # {% else %} {{ firstlevel.url }} {% endif %}" 
+                                    {% if   firstlevel.submenu %} data-toggle="dropdown" aria-haspopup="true"  aria-expanded="false" {% endif %} class="nav-link {% if   firstlevel.submenu %} dropdown-toggle{% endif %}">{{ firstlevel.name }}</a>
+                                {% if firstlevel.submenu %}
+                                    <ul aria-labelledby="dropdown{{firstlevel.ref}}" class="dropdown-menu border-0 shadow">
+                                    {% for secondlevel in firstlevel.submenu %}
+                                        {% if secondlevel.submenu %} 
+                                            <li class="dropdown-submenu dropdown-hover">
+                                                <a id="dropdown{{secondlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                    class="dropdown-item dropdown-toggle">{{secondlevel.name}} </a>
+                                                <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                                                {% for thirdlevel in secondlevel.submenu %}
+                                                    {% if thirdlevel.submenu %} 
+                                                        <li class="dropdown-submenu dropdown-hover">
+                                                            <a id="dropdown{{thirdlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                                class="dropdown-item dropdown-toggle">{{thirdlevel.name}} </a>
+                                                            <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                                                            {% for forthlevel in thirdlevel.submenu %}
+                                                                {% if forthlevel.submenu %} 
+                                                                    <li class="dropdown-submenu dropdown-hover">
+                                                                        <a id="dropdown{{forthlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                                            class="dropdown-item dropdown-toggle">{{forthlevel.name}} </a>
+                                                                        <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                                                                        {% for fifthlevel in forthlevel.submenu %}
+                                                                            
+                                                                        {% endfor %}
+                                                                        </ul>
 
-                                <li class="dropdown-divider"></li>
+                                                                    </li>
+                                                                {% else %} 
+                                                                    <li><a href="{{ forthlevel.url }}" class="dropdown-item">{{forthlevel.name}} </a></li>
 
-                                
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            
-                            <a href="{% url 'branch' %}" class="nav-link"> <i class="fa fa-building"></i> {% trans "Branch" %}</a>
-                        </li>
+                                                                {% endif %}
+                                                                
+                                                            {% endfor %}
+                                                            </ul>
 
-                        <li class="nav-item">
-                            
-                            <a href="{% url 'vendor' %}" class="nav-link"> <i class="fa fa-industry"></i> {% trans "Vendor" %}</a>
-                        </li>
-                        <li class="nav-item">
-                            
-                            <a href="{% url 'transfers' %}" class="nav-link"> <i class="fas fa-exchange-alt"></i> {% trans "Transfers" %}</a>
-                        </li>
-                        <li class="nav-item">
-                            
-                            <a href="{% url 'stock' %}" class="nav-link"> <i class="fas fa-clipboard-check"></i> {% trans "Take Stock" %}</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a id="dropdownSubMenu2" href="#" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false" class="nav-link dropdown-toggle">Reports</a>
-                            <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-                                <li><a href="{% url 'report' %}" class="dropdown-item">Product Report</a></li>
-                                <li><a href="{% url 'stock-report' %}" class="dropdown-item">Stock Report</a></li>
+                                                        </li>
+                                                    {% else %} 
+                                                        <li><a href="{{ thirdlevel.url }}" class="dropdown-item">{{thirdlevel.name}} </a></li>
 
-                                <li class="dropdown-divider"></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </ul>
 
-                                
-                            </ul>
-                        </li>
+                                            </li>
+                                        {% else %} 
+                                            <li><a href="{{ secondlevel.url }}" class="dropdown-item">{{secondlevel.name}} </a></li>
 
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+
+
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        
                         
                     </ul>
 
                     
                 </div>
 
+                <!-- Right navbar links -->
+                <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                 
+                    <li class="nav-iem text-white pl-3 pr-3">
+                    {{user.first_name}} {{user.last_name}}
+                    </li>
+                    <li class="nav-item ">
+                        
+
+                            <a href="{% url 'logout' %}" class="text-white" id="id_logout" title="Log Out">
+                                <i class="fa fa-sign-out-alt  mr-2 text-white"></i> 
+                            </a>
+                            
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                            <i class="fas fa-th-large"></i>
+                        </a>
+                    </li> -->
+                   
+                </ul>
             </div>
         </nav>
         <!-- /.navbar -->

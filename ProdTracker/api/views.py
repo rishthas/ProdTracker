@@ -1,17 +1,94 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from product.models import Branch, Vendor, Product, Transfer, StockCheck
-from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer, StockCheckSerializer
+from product.models import Branch, Vendor, Product, Transfer, StockCheck,Model
+from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer
+from .serializers import StockCheckSerializer, UserSerializer,RoleSerializer,ProfileSerializer,ModelSerializer
 from django.db.models import Count,Q
 import datetime
 import calendar
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth.models import User
+from accounts.models import Role,Profile,RoleAccess
+import json
+from django.conf import settings
+
+
 
 
 # Create your views here.
 
+class RoleViewSet(viewsets.ModelViewSet):
+    serializer_class = RoleSerializer
+    queryset = Role.objects.all()
 
+    def handleParent(self,menu_tree,role):
+        print("In handleParent")
+        for menu in menu_tree:
+            print(menu)
+            if 'submenu' in menu:
+                print("Has Submenu")
+                for submenu in menu["submenu"]:
+                    if 'submenu' in submenu:
+                        self.handleParent(submenu, role)
+                    else:
+                        if RoleAccess.objects.filter(role=role,access_point=submenu["ref"]):
+                            print("Submenu has acccess, so adding to parent with child")
+                            access, created = RoleAccess.objects.get_or_create(role=role,access_point=menu["ref"],access_string="child")
+                            access.save()
+    
+    @action(detail=False, methods=['POST'])
+    def add_with_access(self, request):
+        print(request.POST)
+        role_id = request.POST['role_id']
+        role_desc = request.POST['role_desc']
+        if Role.objects.filter(role_id=role_id):
+            return Response({"message":"Role Id already exists"},status=status.HTTP_400_BAD_REQUEST)
+
+        role = Role(role_id=role_id,description=role_desc)
+        role.save()
+
+        print(request.POST.getlist('access_matrix[]'))
+        for  access_item in request.POST.getlist('access_matrix[]'):
+            access_item_json = json.loads(access_item)
+            print(access_item_json['access_ref'])
+            role_access = RoleAccess(role=role,access_point=access_item_json['access_ref'],access_string=access_item_json['access_type'])
+            role_access.save()
+        self.handleParent(setting.ADMIN_MENU,role)
+        return Response({"message":"The Role {}is Created".format(role_id)})
+    
+    
+    @action(detail=False, methods=['POST'])
+    def editrole(self, request):
+        print(request.POST)
+        role_id = request.POST['role_id']
+        role_desc = request.POST['role_desc']
+        if not Role.objects.filter(role_id=role_id):
+            return Response({"message":"Role Id doesnot exist"},status=status.HTTP_400_BAD_REQUEST)
+
+        role = Role.objects.get(role_id=role_id)
+        role.description = role_desc
+        role.save()
+
+        RoleAccess.objects.filter(role=role).delete()
+
+        print(request.POST.getlist('access_matrix[]'))
+        for  access_item in request.POST.getlist('access_matrix[]'):
+            access_item_json = json.loads(access_item)
+            print(access_item_json['access_ref'])
+            role_access = RoleAccess(role=role,access_point=access_item_json['access_ref'],access_string=access_item_json['access_type'])
+            role_access.save()
+        self.handleParent(settings.ADMIN_MENU,role)
+        return Response({"message":"The Role {}is Edited".format(role_id)})
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
 class BranchViewSet(viewsets.ModelViewSet):
     serializer_class = BranchSerializer
     queryset = Branch.objects.all().order_by('-id')
@@ -20,6 +97,10 @@ class BranchViewSet(viewsets.ModelViewSet):
 class VendorViewSet(viewsets.ModelViewSet):
     serializer_class = VendorSerializer
     queryset = Vendor.objects.all().order_by('-id')
+
+class ModelViewSet(viewsets.ModelViewSet):
+    serializer_class = ModelSerializer
+    queryset = Model.objects.all().order_by('-id')
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -66,11 +147,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.request.query_params.get('vendor', None):
             print("vendor")
             queryset = queryset.filter(
-                vendor__id=self.request.query_params.get('vendor', None))
+                model__vendor__id=self.request.query_params.get('vendor', None))
         if self.request.query_params.get('model', None):
             print("model")
             queryset = queryset.filter(
-                model_no=self.request.query_params.get('model', None))
+                model__id=self.request.query_params.get('model', None))
         if self.request.query_params.get('serial_num', None):
             print("serial_num")
             queryset = queryset.filter(
@@ -165,18 +246,16 @@ class ProductViewSet(viewsets.ModelViewSet):
     def do_stock(self, request):
         response = {}
         serial_num = request.POST["serial_num"]
-        model_no = request.POST["model_no"]
+        model = request.POST["model"]
         month = request.POST["month"]
         year = request.POST["year"]
-        vendor = request.POST["vendor"]
 
         queryset = Product.objects.filter(serial_num=serial_num)
         if not queryset:
             return Response({"message": "The Product is not available"}, status=status.HTTP_400_BAD_REQUEST)
-        if model_no.strip():
-            queryset = queryset.filter(model_no=model_no)
-        if vendor.strip():
-            queryset = queryset.filter(vendor__id=vendor)
+        if model.strip():
+            queryset = queryset.filter(model__id=model)
+        
 
         count = queryset.count()
         if count > 1:
@@ -237,20 +316,20 @@ class ProductAggViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.query_params.get('uninvoiced', None):
-            return Product.objects.filter(invoce_no__isnull=True).values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+            return Product.objects.filter(invoce_no__isnull=True).values('model').annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
 
         if self.request.query_params.get('untransfered', None):
-            return Product.objects.filter(branch__isnull=True).values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+            return Product.objects.filter(branch__isnull=True).values('model').annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
         
         if self.request.query_params.get('unstocked', None):
             if self.request.query_params.get('lastmonth', None):
                 first_day_of_this_month = datetime.date.today().replace(day=1)
 
-                return Product.objects.filter(invoce_no__isnull=True,purchase_date__lt=first_day_of_this_month).values('vendor', 'model_no').exclude(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+                return Product.objects.filter(invoce_no__isnull=True,purchase_date__lt=first_day_of_this_month).values('model').exclude(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
             if self.request.query_params.get('thismonth', None):
                 first_day_of_this_month = datetime.date.today().replace(day=1)
-                return Product.objects.filter(invoce_no__isnull=True,purchase_date__gte=first_day_of_this_month).values('vendor', 'model_no').exclude(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
-        return Product.objects.values('vendor', 'model_no').annotate(cnt=Count('id')).values('vendor__name', 'vendor__code', 'model_no', 'cnt')
+                return Product.objects.filter(invoce_no__isnull=True,purchase_date__gte=first_day_of_this_month).values('model').exclude(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
+        return Product.objects.values('model').annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
 
 
 class TransferViewSet(viewsets.ModelViewSet):

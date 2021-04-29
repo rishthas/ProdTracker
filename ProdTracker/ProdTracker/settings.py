@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from django.utils.translation import ugettext_lazy as _
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,9 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'product',
     'rest_framework',
     'rest_framework_datatables',
+    'accounts',
+    'menu_generator',
 
     
 ]
@@ -152,3 +157,299 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 50,
 }
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+ADMIN_MENU = [
+    
+    {
+        "name": _("Admin"),
+        "icon_class": 'menu-icon fa fa-fw fa fas fa-fax',
+        "url": "#",
+        "ref":"admin",
+        'access_level': 'all',
+        "in_menu" : True,
+        'description': _("Adminstration"),
+        "has_sub" : True,
+        "validators": [("accounts.menu_validators.has_menu_access","admin")],
+        "submenu": [
+            {
+                "name": _("Role Management"),
+                "icon_class": 'menu-icon fa fa-fw fa fa-cubes',
+                "url": "roles",
+                "ref":"role_management",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Role Management"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "add",
+                        "desc": _("Add")
+                    },
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+                "validators": [("accounts.menu_validators.has_menu_access","role_management")],
+                
+            },
+            {
+                "name":_("User Management"),
+                "url": "users",
+                "ref":"user_management",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("User Management"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "add",
+                        "desc": _("Add")
+                    },
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+                "validators": [("accounts.menu_validators.has_menu_access","user_management")],
+
+
+            },
+        ],
+    },
+    {
+        "name": "Product",
+        "icon_class": 'menu-icon fa fa-fw fas fa-history',
+        "url": "#",
+        "ref":"product",
+        'access_level': 'all',
+        "in_menu" : True,
+        'description': _("Product Management"),
+        "has_sub" : True,
+
+        "validators": [("accounts.menu_validators.has_menu_access","product")],
+        "submenu":[
+            
+            {
+                "name": 'Purchase',
+                "url": "purchase",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"prd_purchase",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Purchase Product"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","prd_purchase")],
+            },
+            {
+                "name": 'Transfer',
+                "url": "transfer",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"prd_transfer",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Purchase Transfer"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","prd_transfer")],
+            },
+            {
+                "name": 'Link Invoice',
+                "url": "invoice",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"link_invoice",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Link Invoice"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","link_invoice")],
+            },
+            {
+                "name": 'Take Stock',
+                "url": "stock",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"take_stock",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Take Stock"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","link_invoice")],
+            },
+        ]
+    },
+    {
+        "name": "Prameters",
+        "icon_class": 'menu-icon fa fa-fw fas fa-history',
+        "url": "#",
+        "ref":"parameter",
+        'access_level': 'all',
+        "in_menu" : True,
+        'description': _("Prameters"),
+        "has_sub" : True,
+        "validators": [("accounts.menu_validators.has_menu_access","parameter")],
+        "submenu":[
+            {
+                "name": 'Branches',
+                "url": "branch",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"branches",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Branches"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "add",
+                        "desc": _("Add")
+                    },
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","branches")],
+            },
+            {
+                "name": 'Vendor',
+                "url": "vendor",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"vendor",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Vendor"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "add",
+                        "desc": _("Add")
+                    },
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","vendor")],
+            },
+            {
+                "name": 'Models',
+                "url": "model",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"model",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Models"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "add",
+                        "desc": _("Add")
+                    },
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","model")],
+            },
+            
+            
+
+        ]
+    },
+    {
+        "name": "Reports",
+        "icon_class": 'menu-icon fa fa-fw fas fa-history',
+        "url": "#",
+        "ref":"reports",
+        'access_level': 'all',
+        "in_menu" : True,
+        'description': _("Reports"),
+        "has_sub" : True,
+
+        "validators": [("accounts.menu_validators.has_menu_access","reports")],
+        "submenu":[
+            {
+                "name": 'Product Report',
+                "url": "report",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"prd_report",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Purchase Product"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","prd_report")],
+            },
+            {
+                "name": 'Stock Report',
+                "url": "stock-report",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"stock_rpt",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Stock Report"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","stock_rpt")],
+            },
+        ]
+    },
+
+    
+
+  
+
+]

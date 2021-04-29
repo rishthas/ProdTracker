@@ -1,0 +1,135 @@
+{% extends "product/base.html" %}
+
+{% load i18n %}
+
+{% load static %}
+
+{% block head_title %} {% trans "Add Model" %} {% endblock head_title %}<
+
+{% block heading %} {% trans "Add Model" %}{% endblock heading %}
+
+{% block pagecss %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endblock pagecss %}
+
+ {% block breadcrums %}
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'vendor' %}">{% trans "Models" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'add-vendor' %}">{% trans "Add" %}</a></li>
+
+        
+    </ol>
+{% endblock breadcrums %}
+
+{% block maincontent %}
+<div class="card">
+    <div class="card-header pl-7 bg-gradient-dark">
+        <h2> Add Model</h2>
+
+    </div>
+    <div class="card-body">
+            {% if messages %}
+            
+                    {% for message in messages %}
+                    {% comment %} <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> {% endcomment %}
+                    
+                    <div class="alert alert-custom alert-primary" role="alert">
+                        <div class="alert-icon">
+                            <div class="alert-text"><i class="fa fa-check-circle"></i>  {% if message.tags %}{{ message.tags|title}}{% endif %} : {{ message }}!</div>                    
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+            
+            
+                {% endif %}
+        
+        <form method="post" >
+            {% csrf_token %}
+            {% if form.errors %}
+
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-ban"></i> {% trans "Error!" %}</h5>
+
+                <p>{% trans "There were some errors in the information you entered. Please correct the following:" %}</p>
+                {{ form.non_field_errors }}
+                <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+                </ul>
+
+
+
+
+            </div>
+            <!-- /Error messaging -->
+            <div class="separator separator-dashed my-8"></div>
+            {% endif %}
+            {{form.as_p}}
+            <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
+
+        </form>
+            
+            
+        
+    </div>
+</div>
+{% endblock maincontent%}
+
+
+{% block pagejs %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+          var datatable = $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "serverSide": true,
+                "ajax": '/api/vendor/?format=datatables',
+                columns: [
+                  { data: 'id' },
+                  { data: 'code' },
+                  { data: 'name' },
+                  { data: 'Action',"searchable": false,"orderable": false, "className":"align-middle text-center",
+                    "render": function(data,type,full,meta){
+                      console.log(full)
+                      var rtn_str = "";
+                      rtn_str = rtn_str + '<a dataId="'+ full.id + '"  class="terminal-edit" title="Edit Model">\
+							          <i class="fas fa-edit text-primary"></i>\
+                        </a>\
+                        <a dataId="'+ full.id + '" dataName="' + full.name + '" class="breakTimelist-delete" title="Delete">\
+                          <i class="fas fa-trash text-danger"></i>\
+                        </a>\
+                        ';
+                      return rtn_str;
+
+                    },
+
+                  },
+                  
+                ],
+                
+
+            });
+            
+        });
+    </script>
+{% endblock pagejs %}

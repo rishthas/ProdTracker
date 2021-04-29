@@ -82,7 +82,7 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body bg-gradient-gray">
+  <div class="card-body bg-gradient-dark">
       <div class="row">
       <div class="col-md-2">
         <div class="form-group">
@@ -132,7 +132,15 @@
 
         <div class="form-group">
           <label>Model</label>
-          <input type="text" class="form-control " placeholder="Model" id="model">
+          <select class="form-control select2bs4" style="width: 100%;" id="model">
+            <option value=""></option>
+
+            {% for model in models %}
+              <option value="{{model.id}}">{{model.name}}</option>
+
+            {% endfor %}
+            
+          </select>
         </div>
       </div>
       <div class="col-md-2">
@@ -260,9 +268,9 @@
             "ajax": '/api/product/?format=datatables&stock_rpt=Y&stock='+gld_stock+'&month='+$("#month").val()+'&year='+$("#year").val(),
             columns: [
               
-              { data: 'vendor.code' },
-              { data: 'vendor.name' },
-              { data: 'model_no' },
+              { data: 'model.vendor.code' },
+              { data: 'model.vendor.name' },
+              { data: 'model.name' },
               { data: 'serial_num' },
               { data: 'branch.code' },
               { data: 'branch.name' },

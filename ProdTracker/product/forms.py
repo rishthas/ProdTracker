@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from .models import Branch,Vendor
+from .models import Branch,Vendor,Model
 
 class BranchForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder': _('Branch Name')}),max_length=50, label=_("Branch Name"))
@@ -17,5 +17,15 @@ class VendorForm(forms.ModelForm):
 
     class Meta:
         model = Vendor
+        fields = "__all__"
+
+
+class ModelForm(forms.ModelForm):
+    
+    vendor = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control form-control-sm  ',}),required=True,queryset=Vendor.objects.filter().all())
+    name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder': _('Model')}),max_length=50, label=_("Model Name"))
+
+    class Meta:
+        model = Model
         fields = "__all__"
 

@@ -111,7 +111,7 @@
 {% endif %}
 <div class="card">
   
-  <div class="card-body">
+  <div class="card-body bg-gradient-dark">
     <div class="row">
       <div class="col-md-6">
         <div class="form-group">
@@ -149,8 +149,11 @@
       </div>
     </div>
     <div class="row justify-content-center">
+    <b>Note:- </b> Please click on Transfer button after scanning all the product to transfer the products
+    </div>
+    <div class="row justify-content-center">
       <button type="button" id="transfer" class="btn bg-gradient-primary"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i> Transfer</button>
-
+      
     </div>
   </div>
 </div>
@@ -390,9 +393,9 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
               columns: [
                 { data: 'Action', "searchable": false, "bSortable": false },
                 { data: 'id' },
-                { data: 'vendor.code' },
-                { data: 'vendor.name' },
-                { data: 'model_no' },
+                { data: 'model.vendor.code' },
+                { data: 'model.vendor.name' },
+                { data: 'model.name' },
                 { data: 'serial_num' },
                 { data: 'branch.name' },
               ],
@@ -501,9 +504,9 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 columns: [
                   { data: 'Action', "searchable": false, "bSortable": false },
                   { data: 'id' },
-                  { data: 'vendor.code' },
-                  { data: 'vendor.name' },
-                  { data: 'model_no' },
+                  { data: 'model.vendor.code' },
+                  { data: 'model.vendor.name' },
+                  { data: 'model.name' },
                   { data: 'serial_num' },
                   { data: 'branch.name' },
                 ],
