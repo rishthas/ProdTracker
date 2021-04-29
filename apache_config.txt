@@ -1,0 +1,17 @@
+
+WSGIPythonPath "D:/SHARE/ui_demo"
+WSGIScriptAlias /  "C:/Users/myuser/my_application/my_application/wsgi.py"
+    <Directory "C:/Users/myuser/my_application/my_application">
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+    Alias /static "C:/Users/myuser/my_application/static"
+    Alias /media "C:/Users/myuser/my_application/media"
+    <Directory "C:/Users/myuser/my_application/static">
+        Require all granted
+    </Directory> 
+    <Directory "C:/Users/myuser/my_application/media">
+        Require all granted
+    </Directory> 
