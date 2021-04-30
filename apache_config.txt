@@ -1,17 +1,23 @@
+LoadFile "c:/users/saniy/appdata/local/programs/python/python37/python37.dll"
+LoadModule wsgi_module "c:/users/saniy/appdata/local/programs/python/python37/lib/site-packages/mod_wsgi/server/mod_wsgi.cp37-win_amd64.pyd"
+WSGIPythonHome "c:/users/saniy/appdata/local/programs/python/python37"
 
-WSGIPythonPath "D:/SHARE/ui_demo"
-WSGIScriptAlias /  "C:/Users/myuser/my_application/my_application/wsgi.py"
-    <Directory "C:/Users/myuser/my_application/my_application">
+WSGIPythonPath "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker"
+WSGIScriptAlias /  "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker/ProdTracker/wsgi.py"
+    <Directory "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker/ProdTracker">
         <Files wsgi.py>
             Require all granted
         </Files>
     </Directory>
 
-    Alias /static "C:/Users/myuser/my_application/static"
-    Alias /media "C:/Users/myuser/my_application/media"
-    <Directory "C:/Users/myuser/my_application/static">
+    Alias /static "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker/static"
+    <Directory "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker/static">
         Require all granted
-    </Directory> 
-    <Directory "C:/Users/myuser/my_application/media">
-        Require all granted
-    </Directory> 
+    </Directory>
+
+
+
+create database aimserp;
+CREATE USER 'aims'@'localhost' IDENTIFIED BY 'aims#2021';
+GRANT ALL PRIVILEGES ON aimserp.* to 'aims'@'localhost';
+FLUSH PRIVILEGES;
