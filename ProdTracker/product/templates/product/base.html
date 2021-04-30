@@ -36,11 +36,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <span class="brand-text font-font-weight-bold">{% trans "AIMS Product Tracker" %}</span>
                 </a>
 
-                <!-- <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
+                <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
                     data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
                     aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-                </button> -->
+                </button> 
 
                 {% get_menu "ADMIN_MENU" as admin_menu %}
                 {% comment %} {{left_menu}} {% endcomment %}
@@ -61,19 +61,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         {% if secondlevel.submenu %} 
                                             <li class="dropdown-submenu dropdown-hover">
                                                 <a id="dropdown{{secondlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
-                                                    class="dropdown-item dropdown-toggle">{{secondlevel.name}} </a>
+                                                    class="dropdown-item text-center dropdown-toggle">{{secondlevel.name}} </a>
                                                 <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
                                                 {% for thirdlevel in secondlevel.submenu %}
                                                     {% if thirdlevel.submenu %} 
                                                         <li class="dropdown-submenu dropdown-hover">
                                                             <a id="dropdown{{thirdlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
-                                                                class="dropdown-item dropdown-toggle">{{thirdlevel.name}} </a>
+                                                                class="dropdown-item text-center dropdown-toggle">{{thirdlevel.name}} </a>
                                                             <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
                                                             {% for forthlevel in thirdlevel.submenu %}
                                                                 {% if forthlevel.submenu %} 
                                                                     <li class="dropdown-submenu dropdown-hover">
                                                                         <a id="dropdown{{forthlevel.ref}}" href="#"  role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
-                                                                            class="dropdown-item dropdown-toggle">{{forthlevel.name}} </a>
+                                                                            class="dropdown-item text-center dropdown-toggle">{{forthlevel.name}} </a>
                                                                         <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
                                                                         {% for fifthlevel in forthlevel.submenu %}
                                                                             
@@ -82,7 +82,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                                                                     </li>
                                                                 {% else %} 
-                                                                    <li><a href="{{ forthlevel.url }}" class="dropdown-item">{{forthlevel.name}} </a></li>
+                                                                    <li><a href="{{ forthlevel.url }}" class="dropdown-item text-center">{{forthlevel.name}} </a></li>
 
                                                                 {% endif %}
                                                                 
@@ -91,7 +91,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                                                         </li>
                                                     {% else %} 
-                                                        <li><a href="{{ thirdlevel.url }}" class="dropdown-item">{{thirdlevel.name}} </a></li>
+                                                        <li><a href="{{ thirdlevel.url }}" class="dropdown-item text-center">{{thirdlevel.name}} </a></li>
 
                                                     {% endif %}
                                                 {% endfor %}
@@ -99,7 +99,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                                             </li>
                                         {% else %} 
-                                            <li><a href="{{ secondlevel.url }}" class="dropdown-item">{{secondlevel.name}} </a></li>
+                                            <li><a href="{{ secondlevel.url }}" class="dropdown-item text-center">{{secondlevel.name}} </a></li>
 
                                         {% endif %}
                                     {% endfor %}
