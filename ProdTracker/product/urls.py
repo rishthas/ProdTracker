@@ -13,6 +13,7 @@ urlpatterns = [
     path('transfer/', views.transfer,name="transfer"),
     path('invoice/', views.invoice,name="invoice"),
     path('transfers/', views.transfers,name="transfers"),
+    path('credit_note/', views.credit_note,name="credit_note"),
     path('branch/add', views.add_branch,name="add-branch"),
     path('vendor/add', views.add_vendor,name="add-vendor"),
     path('model/add', views.add_model,name="add-model"),

@@ -118,6 +118,12 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(
                 invoce_no__isnull=True, branch__isnull=False)
 
+        
+        if self.request.query_params.get('for_cr_note', None) == "Y":
+            print("for_cr_note")
+            queryset = queryset.filter(
+                invoce_no__isnull=False, branch__isnull=False)
+
         if self.request.query_params.get('to_branch', None):
             print("to_branch")
             queryset = queryset.exclude(
@@ -214,6 +220,20 @@ class ProductViewSet(viewsets.ModelViewSet):
             product.branch = to_branch
             product.save()
         response["message"] = "Transfered"
+        return Response(response)
+    
+    @action(detail=False, methods=['POST'])
+    def credit_note(self,request):
+        print("Credit Note")
+        response = {}
+        products = request.POST.getlist('products[]')
+        for product_id in products:
+            product = Product.objects.get(id=product_id)
+            product.invoce_no = None
+            product.invoice_date = None
+            product.customer_code = None
+            product.save()
+        response["message"] = "Marked"
         return Response(response)
 
     @action(detail=False, methods=['POST'])

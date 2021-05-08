@@ -26,6 +26,7 @@ from .base_settings import *
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
+STATIC_ROOT = BASE_DIR / 'static/'
 
 DATABASES = {
     'default': {

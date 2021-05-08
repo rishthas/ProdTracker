@@ -27,6 +27,12 @@ DATABASES = {
    }
 }
 
+# STATIC_ROOT = BASE_DIR / 'static/'
+STATICFILES_DIRS = [
+   BASE_DIR / "static",
+   
+]
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

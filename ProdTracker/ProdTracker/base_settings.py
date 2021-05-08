@@ -139,11 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static/'
-#STATICFILES_DIRS = [
-#    BASE_DIR / "static",
-#    
-#]
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT =  BASE_DIR / "media"
@@ -314,7 +310,23 @@ ADMIN_MENU = [
                     "desc": _("Has Access")}
                 ],
 
-                "validators": [("accounts.menu_validators.has_menu_access","link_invoice")],
+                "validators": [("accounts.menu_validators.has_menu_access","take_stock")],
+            },
+            {
+                "name": 'Credit Note',
+                "url": "credit_note",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"credit_note",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Credit Note"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","credit_note")],
             },
         ]
     },

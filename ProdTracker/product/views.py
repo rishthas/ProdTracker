@@ -91,6 +91,13 @@ def transfer(request):
     return render(request,'product/transfer.html',{'branches':branches,'vendors':vendor})
 
 @login_required
+def credit_note(request):
+    branches = Branch.objects.all()
+    vendor = Vendor.objects.all()
+
+    return render(request,'product/credit_note.html',{'branches':branches,'vendors':vendor})
+
+@login_required
 def add_branch(request):
     if request.method == "POST":
         form = BranchForm(request.POST)
