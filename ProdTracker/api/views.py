@@ -197,7 +197,12 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         queryset = queryset.order_by('-id')
         return queryset
-
+    @action(detail=False, methods=['GET'])
+    def customers(self,request):
+        response = []
+        print(request.query_params)
+        response = Product.objects.filter(customer_code__isnull=False,customer_code__icontains=request.query_params.get('q')).values_list('customer_code',flat=True).distinct()
+        return Response(response)
     @action(detail=False, methods=['POST'])
     def transfer(self, request):
         response = {}

@@ -294,6 +294,8 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
     <script src="{% static 'plugins/datatables-select/js/select.bootstrap4.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-scroller/js/dataTables.scroller.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-scroller/js/scroller.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'dist/js/bootstrap-autocomplete.min.js' %}"></script>
+    
     <script>
         $(document).ready(function () {
           var barcode="";
@@ -667,7 +669,11 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
             //   datatable.ajax.url(refreshUrl).load();
             //   datatable.columns.adjust();
             // });
-
+            $('#id_cust_code').autoComplete({
+                resolverSettings: {
+                    url: '/api/product/customers/'
+                }
+            });
           });
     </script>
 {% endblock pagejs %}
