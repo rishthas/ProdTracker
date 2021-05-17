@@ -167,19 +167,25 @@
           </select>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
+          <div class="form-group">
+          <label> Purchase Invoice Number:</label>
+          <input type="text" class="form-control " placeholder="Purchase Invoice Number" id="pur_invoce_no">
+        </div>
+      </div>
+      <div class="col-md-3">
           <div class="form-group">
           <label>Serial Number</label>
           <input type="text" class="form-control " placeholder="Serial Number" id="serial_num">
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
           <label>Invoice Number</label>
           <input type="text" class="form-control " placeholder="Invoice Number" id="invoice_no">
         </div>
       </div>
-      <div class="col-md-4 ">
+      <div class="col-md-3">
         <div class="form-group">
           <label>Customer Code</label>
           <input type="text" class="form-control " placeholder="Customer Code" id="cust_code">
@@ -275,6 +281,8 @@
     <script src="{% static 'plugins/datatables-select/js/select.bootstrap4.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-scroller/js/dataTables.scroller.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-scroller/js/scroller.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'dist/js/bootstrap-autocomplete.min.js' %}"></script>
+
     <script>
         $(document).ready(function () {
           
@@ -309,7 +317,7 @@
             "serverSide": true,
             "ajax": '/api/product/?format=datatables',
             columns: [
-              { data: 'id' },
+              { data: 'pur_invoce_no' },
               { data: 'purchase_date' },
               { data: 'model.vendor.code' },
               { data: 'model.vendor.name' },
@@ -360,6 +368,10 @@
                     refreshUrl = refreshUrl + '&serial_num='+ $("#serial_num").val();
                 
             }
+            if ($("#pur_invoce_no").val()){
+                    refreshUrl = refreshUrl + '&pur_invoce_no='+ $("#pur_invoce_no").val();
+                
+            }
             if ($("#invoice_no").val()){
                     refreshUrl = refreshUrl + '&invoice_no='+ $("#invoice_no").val();
                 
@@ -373,6 +385,12 @@
             datatable.ajax.url(refreshUrl).load();
             datatable.columns.adjust();
             
+          });
+
+          $('#cust_code').autoComplete({
+              resolverSettings: {
+                  url: '/api/product/customers/'
+              }
           });
             
         });

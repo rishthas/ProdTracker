@@ -62,7 +62,7 @@
   
   <div class="card-body bg-gradient-dark">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
           <label> Purchase Date:</label>
             <div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -73,7 +73,14 @@
             </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label> Purchase Invoice Number:</label>
+          <input type="text" class="form-control " placeholder="Purchase Invoice Number" id="pur_invoce_no">
+
+        </div>
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
           <label>Vendor Code / Vendor Name / Model</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="model">
@@ -87,7 +94,7 @@
           </select>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
 
         <div class="form-group">
           <label>To Branch</label>
@@ -129,8 +136,8 @@
     <table id="example1" class="table table-bordered table-striped table-sm">
       <thead class="thead-dark">
       <tr>
-        <th>ID</th>
-        <th>Date</th>
+        <th>Purchase Invoice</th>
+        <th>Purchase Date</th>
         <th>Vendor</th>
         <th>Vendor Code</th>
         <th>Model</th>
@@ -206,6 +213,11 @@
               $("#model").focus();
               return false
             }
+            if($.trim($("#pur_invoce_no").val()) == ""){
+              alert("Please enter the Purchase Invoice No");
+              $("#pur_invoce_no").focus();
+              return false
+            }
             if ($("#to_branch").val() == "") {
               alert("Please select To Branch and read the barcode Again");
               $("#serial_num").val("");
@@ -218,11 +230,13 @@
             model_no=$.trim($("#model").val());
             purchase_date = $.trim($("#purchase_date").val());
             branch = $("#to_branch").val();
+            pur_invoce_no = $("#pur_invoce_no").val();
             data = {
                 "serial_num": serial_num,
                 "model": model_no,
                 "purchase_date": purchase_date,
-                "branch":branch
+                "branch":branch,
+                "pur_invoce_no":pur_invoce_no,
             };
             $.ajax({
               headers: { "X-CSRFToken": csrf_token },
@@ -290,7 +304,7 @@
                 "serverSide": true,
                "ajax": '/api/product/?format=datatables',
                 columns: [
-                  { data: 'id' },
+                  { data: 'pur_invoce_no' },
                   { data: 'purchase_date' },
                   { data: 'model.vendor.code' },
                   { data: 'model.vendor.name' },

@@ -45,6 +45,7 @@ class Product(models.Model):
     # vendor = models.ForeignKey(Vendor, verbose_name=_("Vendor"), on_delete=models.CASCADE)
     # model_no = models.CharField(_("Model No"), max_length=50) 
     model = models.ForeignKey(Model, verbose_name=_("Model"), on_delete=models.CASCADE)
+    pur_invoce_no = models.CharField(_("Purchase Invoice Number"), max_length=50,null=True,blank=True)
     purchase_date = models.DateField(_("Purchase Date"), auto_now=False, auto_now_add=False)   
     branch = models.ForeignKey(Branch, verbose_name=_("Branch"), on_delete=models.SET_NULL,null=True,blank=True)
     invoice_date = models.DateField(_("Invoice Date"),null=True,blank=True)
