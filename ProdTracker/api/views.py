@@ -343,6 +343,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class ProductAggViewSet(viewsets.ModelViewSet):
     serializer_class = ProductAggSerializer
     queryset = Product.objects.all()
+    paginator = None
 
     def get_queryset(self):
         if self.request.query_params.get('uninvoiced', None):
