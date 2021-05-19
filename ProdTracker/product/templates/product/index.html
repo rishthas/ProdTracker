@@ -162,7 +162,7 @@
                   $("#agg_table1 tbody td").remove();
                   $("#agg_table1 tfoot td").remove();
                   var cnt=0;
-                  $.each(response.results, function (indexInArray, row) { 
+                  $.each(response, function (indexInArray, row) { 
                       var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
                     //  console.log(content)
                     $("#agg_table1").append(content);
@@ -178,19 +178,19 @@
                 type: "GET",
                 url: "/api/product_agg/?uninvoiced=Y",
                 success: function (response) {
-                  console.log(response.results)
+                  console.log(response)
                   $("#agg_table2 tbody td").remove();
                   $("#agg_table2 tfoot td").remove();
                   var cnt=0;
                   
-                  $.each(response.results, function (indexInArray, row) { 
+                  $.each(response, function (indexInArray, row) { 
                       var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
                     //  console.log(content)
                     $("#agg_table2").append(content);
                     cnt = cnt + parseInt(row.cnt)
 
                   });
-                  if(response.results.length == 0){
+                  if(response.length == 0){
                     var content="<tr><td colspan='4' class='text-center'>All Products are invoiced</td></tr>"
                     $("#agg_table2").append(content);
                   }
@@ -207,19 +207,19 @@
                 type: "GET",
                 url: "/api/product_agg/?unstocked=Y&lastmonth=Y",
                 success: function (response) {
-                  console.log(response.results)
+                  console.log(response)
                   $("#agg_table3 tbody td").remove();
                   $("#agg_table3 tfoot td").remove();
                   var cnt=0;
                   
-                  $.each(response.results, function (indexInArray, row) { 
+                  $.each(response, function (indexInArray, row) { 
                       var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
                     //  console.log(content)
                     $("#agg_table3").append(content);
                     cnt = cnt + parseInt(row.cnt)
 
                   });
-                  if(response.results.length == 0){
+                  if(response.length == 0){
                     var content="<tr><td colspan='4' class='text-center'>No Descripency in Product stock</td></tr>"
                     $("#agg_table3").append(content);
                   }
@@ -236,19 +236,19 @@
                 type: "GET",
                 url: "/api/product_agg/?unstocked=Y&thismonth=Y",
                 success: function (response) {
-                  console.log(response.results)
+                  console.log(response)
                   $("#agg_table4 tbody td").remove();
                   $("#agg_table4 tfoot td").remove();
                   var cnt=0;
                   
-                  $.each(response.results, function (indexInArray, row) { 
+                  $.each(response, function (indexInArray, row) { 
                       var content="<tr><td>"+ row.vendor_name+"</td><td>"+ row.vendor_code+"</td><td>"+ row.model_no+"</td><td class='text-center text-bold'>"+ row.cnt+"</td></tr>"
                     //  console.log(content)
                     $("#agg_table4").append(content);
                     cnt = cnt + parseInt(row.cnt)
 
                   });
-                  if(response.results.length == 0){
+                  if(response.length == 0){
                     var content="<tr><td colspan='4' class='text-center'>No Descripency in Product stock</td></tr>"
                     $("#agg_table4").append(content);
                   }
