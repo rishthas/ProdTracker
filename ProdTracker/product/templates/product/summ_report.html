@@ -92,8 +92,8 @@
         <th>Vendor Code</th>
         <th>Vendor Name</th>
         <th>Model</th>
-        <th>Purchase</th>
-        <th>Sale</th>
+        <th>Total Purchase</th>
+        <th>Total Sale</th>
         <th>Available</th>
         <th>Last month Stock Discrepancies</th>
         <th>This month Stock Discrepancies</th>
@@ -182,7 +182,7 @@
           
           
           $("#example1").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,
+       "lengthChange": false, "autoWidth": false,
       "scrollX": true,
       "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
