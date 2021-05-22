@@ -54,7 +54,8 @@ def report(request):
 
 @login_required
 def summ_report(request):
-    first_day_of_this_month = datetime.today().replace(day=1)
+    first_day_of_this_month = datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+    print(first_day_of_this_month)
     summary = Product.objects.values('model').annotate(
     tot_purchase=Count('id'),
     uninvoiced=Count(
@@ -67,22 +68,22 @@ def summ_report(request):
         ),
     lastmonth=Count(
         'id',
-        filter=~Q(
+        filter=Q(
             invoce_no__isnull=True,
-            purchase_date__lt=first_day_of_this_month,
-            id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+            purchase_date__lt=first_day_of_this_month)&
+            ~Q(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
         )
         ),
     thismonth=Count(
         'id',
-        filter=~Q(
-            invoce_no__isnull=True,
-            id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
+        filter=Q(
+            invoce_no__isnull=True)&
+            ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
 
         )
         )
         ).values('model__vendor__name', 'model__vendor__code', 'model__name', 'tot_purchase','uninvoiced','sale','lastmonth','thismonth')
-
+    print(summary.query)
     return render(request,'product/summ_report.html',{'summary':summary})
 
 @login_required
