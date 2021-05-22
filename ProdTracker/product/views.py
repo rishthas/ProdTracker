@@ -3,11 +3,14 @@ from .forms import BranchForm,VendorForm,ModelForm
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from .models import Branch,Vendor,Model
+from .models import Branch, Vendor, Product, Transfer, StockCheck,Model
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from accounts.models import RoleAccess
+from django.db.models import Count, Q
+
+
 
 
 
@@ -48,6 +51,39 @@ def report(request):
     models = Model.objects.all()
 
     return render(request,'product/report.html',{'branches':branches,'vendors':vendor,'models':models})
+
+@login_required
+def summ_report(request):
+    first_day_of_this_month = datetime.today().replace(day=1)
+    summary = Product.objects.values('model').annotate(
+    tot_purchase=Count('id'),
+    uninvoiced=Count(
+        'id',
+        filter=Q(invoce_no__isnull=True)
+        ),
+    sale=Count(
+        'id',
+        filter=Q(invoce_no__isnull=False)
+        ),
+    lastmonth=Count(
+        'id',
+        filter=~Q(
+            invoce_no__isnull=True,
+            purchase_date__lt=first_day_of_this_month,
+            id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+        )
+        ),
+    thismonth=Count(
+        'id',
+        filter=~Q(
+            invoce_no__isnull=True,
+            id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
+
+        )
+        )
+        ).values('model__vendor__name', 'model__vendor__code', 'model__name', 'tot_purchase','uninvoiced','sale','lastmonth','thismonth')
+
+    return render(request,'product/summ_report.html',{'summary':summary})
 
 @login_required
 def stock_report(request):

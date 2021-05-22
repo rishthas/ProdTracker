@@ -468,6 +468,22 @@ ADMIN_MENU = [
 
                 "validators": [("accounts.menu_validators.has_menu_access","stock_rpt")],
             },
+            {
+                "name": 'Summary Report',
+                "url": "summ-report",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"summ_report",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Summary Report"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","summ_report")],
+            },
         ]
     },
 
