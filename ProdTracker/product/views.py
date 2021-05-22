@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from .models import Branch, Vendor, Product, Transfer, StockCheck,Model
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from accounts.models import RoleAccess
@@ -18,9 +18,41 @@ from django.db.models import Count, Q
 # Create your views here.
 @login_required
 def index(request):
+    first_day_of_this_month = datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+    print(first_day_of_this_month)
     this_month = datetime.today().strftime("%b-%Y")
+    summary = Product.objects.aggregate(
+        tot_purchase=Count('id'),
+        uninvoiced=Count(
+            'id',
+            filter=Q(invoce_no__isnull=True)
+            ),
+        sale=Count(
+            'id',
+            filter=Q(invoce_no__isnull=False)
+            ),
+        lastmonth=Count(
+            'id',
+            filter=Q(
+                invoce_no__isnull=True,
+                purchase_date__lt=first_day_of_this_month)&
+                ~Q(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+            )
+            ),
+        thismonth=Count(
+            'id',
+            filter=Q(
+                invoce_no__isnull=True)&
+                ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
+
+            )
+            )
+            )
+
+    start_date =   first_day_of_this_month - timedelta(days=365)
     
-    return render(request,'product/index.html',{"this_month":this_month})
+    print(start_date)  
+    return render(request,'product/index.html',{"this_month":this_month,'summary':summary})
 
 @login_required
 def branch(request):
