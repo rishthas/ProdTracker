@@ -339,30 +339,32 @@ class ProductViewSet(viewsets.ModelViewSet):
         print(queryset.query)
         serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data)
-
+   
+        
     @action(detail=False, methods=['GET'])
     def chartjs(self,request):
         response = {}
         first_day_of_this_month = datetime.datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
-        calc_date =   datetime.datetime.today() - relativedelta(years=1)
+        calc_date =   Product.objects.order_by("purchase_date")[0].purchase_date
         labels = []
         purchases = []
         sale = []
-        while calc_date <= datetime.datetime.today():
+        while calc_date <= datetime.datetime.today().date():
             
             
             print(calc_date)
             print(datetime.datetime.strftime(calc_date, "%b-%Y"))
             labels.append(datetime.datetime.strftime(calc_date, "%b-%Y"))
-            print(calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0))
-            print(calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0) + relativedelta(months=1))
-            purchases.append(Product.objects.filter(purchase_date__gte=calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0),purchase_date__lt= calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0) + relativedelta(months=1)).count())
-            sale.append(Product.objects.filter(invoice_date__gte=calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0),invoice_date__lt= calc_date.replace(day=1,hour=0,minute=0,second=0,microsecond=0) + relativedelta(months=1)).count())
+            print(calc_date)
+            print(calc_date + relativedelta(months=1))
+            purchases.append(Product.objects.filter(purchase_date__gte=calc_date,purchase_date__lt= calc_date + relativedelta(months=1)).count())
+            sale.append(Product.objects.filter(invoice_date__gte=calc_date,invoice_date__lt= calc_date + relativedelta(months=1)).count())
             
             calc_date = calc_date + relativedelta(months=1)
         response["labels"] = labels
         response["purchases"] = purchases
         response["sale"] = sale
+        response["average"] = [sum(sale) / len(sale)]* len(sale)
         return Response(response)
 
 class ProductAggViewSet(viewsets.ModelViewSet):
