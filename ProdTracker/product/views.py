@@ -50,9 +50,10 @@ def index(request):
             )
 
     start_date =   first_day_of_this_month - timedelta(days=365)
-    
+    vendor = Vendor.objects.all()
+    models = Model.objects.all()
     print(start_date)  
-    return render(request,'product/index.html',{"this_month":this_month,'summary':summary})
+    return render(request,'product/index.html',{"this_month":this_month,'summary':summary,'vendors':vendor,'models':models})
 
 @login_required
 def branch(request):

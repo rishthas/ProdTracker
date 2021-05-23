@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 {% endblock pagecss %}
 
  {% block breadcrums %}
@@ -114,6 +117,37 @@
               <div class="card-body">
                 <div class="chart">
                   <canvas id="stackedBarChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    <div class="row justify-content-center">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label>Vendor</label>
+                          <select class="form-control-sm select2bs4" style="width: 100%;" id="id_vendor">
+                            <option value="">All</option>
+
+                            {% for vendor in vendors %}
+                              <option value="{{vendor.id}}">{{vendor.code}}/{{vendor.name}}</option>
+
+                            {% endfor %}
+                            
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+
+                        <div class="form-group">
+                          <label>Model</label>
+                          <select class="form-control-sm select2bs4" style="width: 100%;" id="model">
+                            <option value="">All</option>
+
+                            {% for model in models %}
+                              <option value="{{model.id}}">{{model.name}}</option>
+
+                            {% endfor %}
+                            
+                          </select>
+                        </div>
+                      </div>
+                    </div>
                 </div>
               </div>
               <!-- /.card-body -->
@@ -141,8 +175,16 @@
     <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
     <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
     <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+     <!-- Select2 -->
+    <script src="{% static 'plugins/select2/js/select2.full.min.js' %}"></script>
     <script>
        $(document).ready(function () {
+         var stackedBarChartCanvas = $('#stackedBarChart').get(0).getContext('2d')  
+         var chart = new Chart(stackedBarChartCanvas, {
+              type: 'bar',
+              data: {labels:['Dummy'],datasets:[{data:[0],}]},
+              options: {}
+            });
 
         $.ajax({
         url: '/api/product/chartjs/',
@@ -163,25 +205,25 @@
                 },
                 {
                   label               : 'Sales',
-                  backgroundColor     : 'Lightblue',
-                  borderColor         : 'Lightblue',
+                  backgroundColor     : 'Rgba(60,188,171,0.9)',
+                  borderColor         : 'Rgba(60,188,171,0.9)',
                   pointRadius         : true,
-                  pointColor          : 'Lightblue',
+                  pointColor          : 'Rgba(60,188,171,0.9)',
                   pointStrokeColor    : '#c1c7d1',
                   pointHighlightFill  : '#fff',
-                  pointHighlightStroke: 'Lightblue',
+                  pointHighlightStroke: 'Rgba(60,188,171,0.9)',
                   data                : data.sale,
                   
                 },
                 {
                   label               : 'Average Sale',
-                  backgroundColor     : 'Dark',
-                  borderColor         : 'Dark',
+                  backgroundColor     : 'rgb(169,169,169)',
+                  borderColor         : 'rgb(169,169,169)',
                   pointRadius         : true,
-                  pointColor          : 'Dark',
+                  pointColor          : 'rgb(169,169,169)',
                   pointStrokeColor    : '#c1c7d1',
-                  pointHighlightFill  : 'Dark',
-                  pointHighlightStroke: 'Dark',
+                  pointHighlightFill  : 'rgb(169,169,169)',
+                  pointHighlightStroke: 'rgb(169,169,169)',
                   data                : data.average,
                   fill                : false,
                   type                : "line"
@@ -195,7 +237,7 @@
             var temp1 = areaChartData.datasets[1]
             barChartData.datasets[0] = temp1
             barChartData.datasets[1] = temp0
-            var stackedBarChartCanvas = $('#stackedBarChart').get(0).getContext('2d')
+            
             var stackedBarChartData = $.extend(true, {}, barChartData)
 
             var barChartOptions = {
@@ -204,11 +246,9 @@
               datasetFill             : false
             }
 
-            new Chart(stackedBarChartCanvas, {
-              type: 'bar',
-              data: barChartData,
-              options: barChartOptions
-            })
+            chart.data=barChartData;
+            chart.options = barChartOptions
+            chart.update();              
 
 
 
@@ -216,9 +256,103 @@
         });
 
          
+      $('.select2bs4').select2({
+            theme: 'classic'
+          });
+      function refresh_chart() { 
+        var refresh_url = '/api/product/chartjs/';
+        var hasQuery = false;
+        if ($("#id_vendor").val()){
+          refresh_url = refresh_url + '?vendor='+ $("#id_vendor").val();
+          hasQuery = true;
+            
+        }
+        if ($("#model").val()){
+          if(hasQuery){
+            refresh_url = refresh_url + '&model='+ $("#model").val();
+          }else{
+            refresh_url = refresh_url + '?model='+ $("#model").val();
+          }
+        }
+        $.ajax({
+        url: refresh_url,
+        success: function (data) {
+            var areaChartData = {
+              labels  : data.labels,
+              datasets: [
+                {
+                  label               : 'Purchases',
+                  backgroundColor     : 'rgba(60,141,188,0.9)',
+                  borderColor         : 'rgba(60,141,188,0.8)',
+                  pointRadius          : true,
+                  pointColor          : '#3b8bba',
+                  pointStrokeColor    : 'rgba(60,141,188,1)',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgba(60,141,188,1)',
+                  data                : data.purchases
+                },
+                {
+                  label               : 'Sales',
+                  backgroundColor     : 'rgba(60,188,171,0.9)',
+                  borderColor         : 'rgba(60,188,171,0.8)',
+                  pointRadius         : true,
+                  pointColor          : 'rgba(60,188,171,1)',
+                  pointStrokeColor    : '#3cbcab',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgba(60,188,171,1)',
+                  data                : data.sale,
+                  
+                },
+                {
+                  label               : 'Average Sale',
+                  fill: false,
+                  backgroundColor     : 'rgb(169,169,169)',
+                  borderColor         : 'rgb(169,169,169)',
+                  pointRadius         : true,
+                  pointColor          : 'rgb(169,169,169)',
+                  pointStrokeColor    : '#3cbcab',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgb(169,169,169)',
+                  data                : data.average,
+                  type                : "line"
+                  
+                },
+              ]
+            
+            }
+            var barChartData = $.extend(true, {}, areaChartData)
+            var temp0 = areaChartData.datasets[0]
+            var temp1 = areaChartData.datasets[1]
+            barChartData.datasets[0] = temp1
+            barChartData.datasets[1] = temp0
+            
+            var stackedBarChartData = $.extend(true, {}, barChartData)
+
+            var barChartOptions = {
+              responsive              : true,
+              maintainAspectRatio     : false,
+              datasetFill             : false
+            }
+
+            chart.data=barChartData;
+            chart.options = barChartOptions
+            chart.update();              
+
+
+
+        },
+        });
+
+      }
+      $("#id_vendor,#model").change(function (e) { 
+        refresh_chart();
         
+      });
       
             
       });
     </script>
 {% endblock pagejs %}
+
+
+

@@ -357,8 +357,18 @@ class ProductViewSet(viewsets.ModelViewSet):
             labels.append(datetime.datetime.strftime(calc_date, "%b-%Y"))
             print(calc_date)
             print(calc_date + relativedelta(months=1))
-            purchases.append(Product.objects.filter(purchase_date__gte=calc_date,purchase_date__lt= calc_date + relativedelta(months=1)).count())
-            sale.append(Product.objects.filter(invoice_date__gte=calc_date,invoice_date__lt= calc_date + relativedelta(months=1)).count())
+            queryset = Product.objects.all()
+            if self.request.query_params.get('vendor', None):
+                print("vendor")
+                queryset = queryset.filter(
+                    model__vendor__id=self.request.query_params.get('vendor', None))
+            if self.request.query_params.get('model', None):
+                print("model")
+                queryset = queryset.filter(
+                    model__id=self.request.query_params.get('model', None))
+            
+            purchases.append(queryset.filter(purchase_date__gte=calc_date,purchase_date__lt= calc_date + relativedelta(months=1)).count())
+            sale.append(queryset.filter(invoice_date__gte=calc_date,invoice_date__lt= calc_date + relativedelta(months=1)).count())
             
             calc_date = calc_date + relativedelta(months=1)
         response["labels"] = labels
