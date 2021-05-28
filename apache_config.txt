@@ -17,7 +17,7 @@ WSGIScriptAlias /  "C:/AIMS_PRD_TRACKER/ProdTracker/ProdTracker/ProdTracker/wsgi
 
 
 
-create database aimserp;
-CREATE USER 'aims'@'localhost' IDENTIFIED BY 'aims#2021';
-GRANT ALL PRIVILEGES ON aimserp.* to 'aims'@'localhost';
+create database alphaerp;
+CREATE USER 'alpha'@'localhost' IDENTIFIED BY 'alpha#2021';
+GRANT ALL PRIVILEGES ON alphaerp.* to 'alpha'@'localhost';
 FLUSH PRIVILEGES;
