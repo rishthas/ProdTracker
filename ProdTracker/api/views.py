@@ -345,7 +345,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     def chartjs(self,request):
         response = {}
         first_day_of_this_month = datetime.datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
-        calc_date =   Product.objects.order_by("purchase_date")[0].purchase_date
+        if Product.objects.all().exists():
+            calc_date =   Product.objects.order_by("purchase_date")[0].purchase_date
+        else:
+            calc_date = first_day_of_this_month
         labels = []
         purchases = []
         sale = []
