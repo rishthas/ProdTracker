@@ -31,9 +31,9 @@ STATIC_ROOT = BASE_DIR / 'static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aimserp',
-        'USER': 'aims',
-        'PASSWORD': 'aims#2021',
+        'NAME': 'alphaerp',
+        'USER': 'alpha',
+        'PASSWORD': 'alpha#2021',
         'HOST': 'localhost',
         'PORT': 3307
     }
