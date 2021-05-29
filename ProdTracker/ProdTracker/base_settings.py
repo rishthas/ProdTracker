@@ -484,6 +484,22 @@ ADMIN_MENU = [
 
                 "validators": [("accounts.menu_validators.has_menu_access","summ_report")],
             },
+            {
+                "name": 'Transfers Report',
+                "url": "transfers",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"transfers",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Transfers Report"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","transfers")],
+            },
         ]
     },
 
