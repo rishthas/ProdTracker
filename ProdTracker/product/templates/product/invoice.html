@@ -623,10 +623,14 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 },
                 error:function(xhr,status,error,){
                 console.log("In Error");
-                console.log(xhr.responseJSON.non_field_errors[0]);
+                {% comment %} console.log(xhr.responseJSON.non_field_errors[0]); {% endcomment %}
                 console.log(status);
                 console.log(error);
-                toastr.error(xhr.responseJSON.non_field_errors[0]);
+                {% comment %} toastr.error(xhr.responseJSON.non_field_errors[0]); {% endcomment %}
+                  $('#overlay').fadeOut();
+
+                Swal.fire("Error!",xhr.responseJSON.message,"error");
+
                 }
               });
 

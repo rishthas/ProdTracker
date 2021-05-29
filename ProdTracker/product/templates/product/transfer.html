@@ -113,9 +113,24 @@
   
   <div class="card-body bg-gradient-dark">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
-          <label> Transfer Date:</label>
+          <label>Type</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="type">
+            
+
+            
+              
+
+              <option value="I">In</option> 
+              <option value="O">Out</option> 
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label> Date:</label>
             <div class="input-group date" id="reservationdate" data-target-input="nearest">
                 <input type="text" class="form-control  datetimepicker-input" data-target="#reservationdate" id="purchase_date"/>
                 <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
@@ -124,9 +139,9 @@
             </div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
-          <label>To Branch</label>
+          <label>Branch</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="to_branch">
             <option value=""></option>
 
@@ -308,7 +323,7 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
               barcode="";
               return false;
             }
-            var product_list_url = '/api/product/?format=datatables&for_transfer=Y&to_branch=' + $("#to_branch").val() + '&serial_num=' + $("#serial_num").val();
+            var product_list_url = '/api/product/?format=datatables&for_transfer=Y&serial_num=' + $("#serial_num").val();
             console.log(product_list_url)
             $.ajax({
               type: "GET",
@@ -579,6 +594,11 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 $("#to_branch").focus();
                 return false
               }
+              if ($.trim($("#type").val()) == "") {
+                alert("Please select a Type of Transfer");
+                $("#type").focus();
+                return false
+              }
               var products = sel_prd_table.rows({ selected: true }).data();
 
               if (products.length == 0) {
@@ -595,7 +615,7 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 prd_ids.push(valueOfElement.id)
                     
               });
-              data={"transfer_date": $.trim($("#purchase_date").val()), "to_branch":$.trim($("#to_branch").val()),"products":prd_ids }
+              data={"transfer_date": $.trim($("#purchase_date").val()), "to_branch":$.trim($("#to_branch").val()),"products":prd_ids,"type":$.trim($("#type").val())}
               console.log(data)
               
               // $('#overlay').fadeIn().delay(2000).fadeOut();
@@ -619,10 +639,14 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 },
                 error:function(xhr,status,error,){
                 console.log("In Error");
-                console.log(xhr.responseJSON.non_field_errors[0]);
+                // console.log(xhr.responseJSON.non_field_errors[0]);
+                console.log(xhr.responseJSON.message);
                 console.log(status);
                 console.log(error);
-                toastr.error(xhr.responseJSON.non_field_errors[0]);
+                $('#overlay').fadeOut();
+                // toastr.error(xhr.responseJSON.message);
+                Swal.fire("Error!",xhr.responseJSON.message,"error");
+
                 }
               });
 

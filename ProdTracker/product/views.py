@@ -46,6 +46,10 @@ def index(request):
                 ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
 
             )
+            ),
+        intransit=Count(
+            'id',
+            filter=Q(status="O")
             )
             )
 
@@ -114,8 +118,12 @@ def summ_report(request):
             ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
 
         )
+        ),
+    intransit=Count(
+        'id',
+        filter=Q(status="O")
         )
-        ).values('model__vendor__name', 'model__vendor__code', 'model__name', 'tot_purchase','uninvoiced','sale','lastmonth','thismonth')
+        ).values('model__vendor__name', 'model__vendor__code', 'model__name', 'tot_purchase','uninvoiced','sale','intransit','lastmonth','thismonth')
     print(summary.query)
     return render(request,'product/summ_report.html',{'summary':summary})
 

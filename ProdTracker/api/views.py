@@ -210,6 +210,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         response = Product.objects.filter(customer_code__isnull=False,customer_code__icontains=request.query_params.get('q')).values_list('customer_code',flat=True).distinct()
         return Response(response)
     @action(detail=False, methods=['POST'])
+
     def transfer(self, request):
         response = {}
         transfer_date = datetime.datetime.strptime(
@@ -219,17 +220,40 @@ class ProductViewSet(viewsets.ModelViewSet):
         print(to_branch)
         products = request.POST.getlist('products[]')
         print(products)
+        transfer_type = request.POST["type"]
+        print(transfer_type)
         for product_id in products:
             product = Product.objects.get(id=product_id)
-            if product.branch:
-                transfer = Transfer(product=product, branch=product.branch,
-                                    date=transfer_date, status="O", remark="Manual Transfer")
+            if transfer_type == "I" and product.status != "O":
+                return Response({"message": "The Product {}/{}/{} is not in Transit".format(product.model.vendor.name,product.model.name,product.serial_num)}, status=status.HTTP_400_BAD_REQUEST)
+            if transfer_type == "O" and product.status == "O":
+                return Response({"message": "The Product {}/{}/{} is already in Transit".format(product.model.vendor.name,product.model.name,product.serial_num)}, status=status.HTTP_400_BAD_REQUEST)
+            if transfer_type == "O" and product.status == "I" and product.branch != to_branch:
+                return Response({"message": "The Product {}/{}/{} is not in Branch [{}]".format(product.model.vendor.name,product.model.name,product.serial_num,to_branch.name)}, status=status.HTTP_400_BAD_REQUEST)
+        for product_id in products:
+            product = Product.objects.get(id=product_id)
+            if transfer_type == "I" and product.status == "O":
+                transfer = Transfer(product=product, branch=to_branch,date=transfer_date, status="I", remark="Manual Transfer In")
+                product.status = "I"
+                product.branch = to_branch
                 transfer.save()
-            transfer = Transfer(product=product, branch=to_branch,
-                                date=transfer_date, status="I", remark="Manual Transfer")
-            transfer.save()
-            product.branch = to_branch
-            product.save()
+                product.save()
+            if transfer_type == "O" and product.status == "I":
+                transfer = Transfer(product=product, branch=to_branch,date=transfer_date, status="O", remark="Manual Transfer Out")
+                product.status = "O"
+                product.branch = to_branch
+                transfer.save()
+                product.save()
+
+        #     if product.branch:
+        #         transfer = Transfer(product=product, branch=product.branch,
+        #                             date=transfer_date, status="O", remark="Manual Transfer")
+        #         transfer.save()
+        #     transfer = Transfer(product=product, branch=to_branch,
+        #                         date=transfer_date, status="I", remark="Manual Transfer")
+        #     transfer.save()
+        #     product.branch = to_branch
+        #     product.save()
         response["message"] = "Transfered"
         return Response(response)
     
@@ -260,6 +284,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         products = request.POST.getlist('products[]')
         print(products)
         for product_id in products:
+            if Product.objects.filter(id=product_id,status="O"):
+                return Response({"message": "The Product {} is in Transit as per the record in system".format(Product.objects.get(id=product_id,status="O").serial_num)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        for product_id in products:
             product = Product.objects.get(id=product_id)
 
             transfer = Transfer(product=product, branch=product.branch, date=invoice_date,
@@ -268,6 +297,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             product.invoice_date = invoice_date
             product.invoce_no = invoice_no
             product.customer_code = cust_code
+            product.status = "S"
 
             product.save()
         response["message"] = "Linked"
@@ -296,6 +326,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         print(queryset.query)
         if not queryset:
             return Response({"message": "The Product is already Invoiced in the system"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        queryset = queryset.exclude(status='O')
+        print(queryset.query)
+        if not queryset:
+            return Response({"message": "The Product is in Transit as per the record in system"}, status=status.HTTP_400_BAD_REQUEST)
 
         product = queryset.first()
         print(product)
