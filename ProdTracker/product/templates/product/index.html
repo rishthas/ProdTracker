@@ -26,7 +26,7 @@
 
 {% block maincontent %}
 <!-- Small Box (Stat card) -->
-        <h2 class="mb-2 mt-4">Summary</h2>
+        <h2 class="mb-2 mt-4"> Product Summary</h2>
         <div class="row">
           <div class="col-lg-3 col-6">
             <!-- small card -->
@@ -64,11 +64,11 @@
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small card -->
-            <div class="small-box bg-gradient-danger">
+            <div class="small-box bg-gradient-lightblue">
               <div class="inner">
-                <h3>{{summary.lastmonth}}</h3>
+                <h3>{{summary.uninvoiced}}</h3>
 
-                <p>Unstocked Products < [{{this_month}}]</p>
+                <p>Available Stock</p>
               </div>
               <div class="icon">
                 <i class="fas fa-cubes"></i>
@@ -83,12 +83,12 @@
             <!-- small card -->
             <div class="small-box bg-gradient-warning">
               <div class="inner">
-                <h3>{{summary.thismonth}}</h3>
+                <h3>{{summary.intransit}}</h3>
 
-                <p>Unstocked Products [{{this_month}}]</p>
+                <p>In Transit</p>
               </div>
               <div class="icon">
-                <i class="fas fa-chart-pie"></i>
+                <i class="fas fa-truck"></i>
               </div>
               <a href="{% url 'summ-report' %}" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
@@ -96,6 +96,42 @@
             </div>
           </div>
           <!-- ./col -->
+        </div><h2 class="mb-2 mt-4"> Stock Summary</h2>
+        
+        <div class="row">
+          <div class="col-lg-6 col-6">
+            <!-- small card -->
+            <div class="small-box bg-gradient-danger">
+              <div class="inner">
+                <h3>{{summary.lastmonth}}</h3>
+  
+                <p>Previous Months Discrepancies</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-exclamation-circle"></i>
+
+              </div>
+              <a href="{% url 'summ-report' %}" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-6 col-6">
+            <!-- small card -->
+            <div class="small-box bg-gradient-warning">
+              <div class="inner">
+                <h3>{{summary.thismonth}}</h3>
+  
+                <p>This Months Discrepancies</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <a href="{% url 'summ-report' %}" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
+          </div>
         </div>
         <!-- /.row -->
         <div class="row">
