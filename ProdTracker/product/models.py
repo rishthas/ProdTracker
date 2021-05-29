@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 class Branch(models.Model):
@@ -38,6 +40,7 @@ class Model(models.Model):
     class Meta:
         verbose_name = 'Model'
         verbose_name_plural = 'Models'
+        unique_together=('vendor','name')
   
 
 class Product(models.Model):
@@ -51,6 +54,7 @@ class Product(models.Model):
     invoice_date = models.DateField(_("Invoice Date"),null=True,blank=True)
     invoce_no = models.CharField(_("Invoice Number"), max_length=50,null=True,blank=True)
     customer_code = models.CharField(_("Customer Code"), max_length=50,null=True,blank=True)
+    status = models.CharField(_("Status"), max_length=50,choices=(("I","In"),("O","Out"),("S","Sold")),default='I')
 
     class Meta:
         verbose_name = _("Product")
@@ -97,3 +101,10 @@ class StockCheck(models.Model):
     def __str__(self):
         return "{}_{}_{}".format(self.product.serial_num,self.month,self.year)
 
+@receiver(post_save, sender=Product)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        transfer = Transfer(product=instance, branch=instance.branch,
+            date=instance.purchase_date, status="I", remark="Purchase-{}".format(instance.pur_invoce_no))
+        transfer.save()
+    
