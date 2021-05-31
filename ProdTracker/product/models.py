@@ -80,7 +80,7 @@ class Transfer(models.Model):
         verbose_name_plural = _("Transfers")
 
     def __str__(self):
-        return self.name
+        return self.id
 
 
 
