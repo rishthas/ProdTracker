@@ -416,7 +416,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         response["labels"] = labels
         response["purchases"] = purchases
         response["sale"] = sale
-        response["average"] = [sum(sale) / len(sale)]* len(sale)
+        sale_len = 0
+        sale_len = sum([1 for x in sale if x > 0])
+        if sale_len == 0:
+            sale_len = 1
+        response["average"] = [sum(sale) / sale_len]* sale_len
         return Response(response)
 
 class ProductAggViewSet(viewsets.ModelViewSet):
