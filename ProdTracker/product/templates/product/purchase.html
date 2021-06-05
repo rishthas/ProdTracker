@@ -136,6 +136,7 @@
     <table id="example1" class="table table-bordered table-striped table-sm">
       <thead class="thead-dark">
       <tr>
+        <th>id</th>
         <th>Purchase Invoice</th>
         <th>Purchase Date</th>
         <th>Vendor</th>
@@ -297,6 +298,7 @@
             theme: 'bootstrap4'
           });
           var datatable = $("#example1").DataTable({
+                "order": [[ 0, "desc" ]],
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": true,
@@ -304,6 +306,7 @@
                 "serverSide": true,
                "ajax": '/api/product/?format=datatables',
                 columns: [
+                  { data: 'id',visible: false},
                   { data: 'pur_invoce_no' },
                   { data: 'purchase_date' },
                   { data: 'model.vendor.code' },

@@ -132,7 +132,7 @@
                   },
                   
                 ],
-                "initComplete": function(settings, json) {
+                "fnDrawCallback": function(settings, json) {
                   $(".vendor-delete").click(function(){
                     // alert($(this).attr("dataId"));
                     delete_vendor($(this).attr("dataId"),$(this).attr("dataName"));
@@ -143,7 +143,7 @@
             });
 
             function delete_vendor(id,name) {
-              if(confirm("Are you Sure on Deleting the Model ["+ name+"]. Note: All the transactions and product in this vendor also will be deleted !!! ")){
+              if(confirm("Are you Sure on Deleting the Model ["+ name+"]. Note: All the transactions and product in this Model also will be deleted !!! ")){
                 $.ajax({
                   headers: { "X-CSRFToken": csrf_token },
                   type: "DELETE",
