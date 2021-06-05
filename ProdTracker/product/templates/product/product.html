@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables-select/css/select.bootstrap4.min.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/datatables-scroller/css/scroller.bootstrap4.min.css' %}">
-  <style>
+  {% comment %} <style>
     th{
 				white-space: nowrap ;
 				text-align: center; 
@@ -46,7 +46,7 @@
 				text-align: center; 
     			vertical-align: middle;
 			}
-  </style>
+  </style> {% endcomment %}
 {% endblock pagecss %}
 
  {% block breadcrums %}
@@ -155,7 +155,7 @@
       <div class="col-md-4">
 
         <div class="form-group">
-          <label>Model</label>
+          <label>Poduct</label>
           <select class="form-control select2bs4" style="width: 100%;" id="model">
             <option value=""></option>
 
@@ -219,13 +219,14 @@
         <th>Purchase Date</th>
         <th>Vendor Code</th>
         <th>Vendor Name</th>
-        <th>Model</th>
+        <th>Poduct</th>
         <th>Serial No</th>
-        <th>Branch Code</th>
-        <th>Branch Name</th>
-        <th>Invoice Date</th>
-        <th>Invoice No</th>
-        <th>Customer Code</th>
+        <th>Action</th>
+        {% comment %} <th>Branch Code</th> {% endcomment %}
+        {% comment %} <th>Branch Name</th> {% endcomment %}
+        {% comment %} <th>Invoice Date</th> {% endcomment %}
+        {% comment %} <th>Invoice No</th> {% endcomment %}
+        {% comment %} <th>Customer Code</th> {% endcomment %}
         
 
       </tr>
@@ -287,6 +288,8 @@
     <script>
         $(document).ready(function () {
           
+           var access_modify = "{% if 'modify' in access_type %}true{% else %}false{% endif %}";
+          var access_delete = "{% if 'delete' in access_type %}true{% else %}false{% endif %}";
 
           
           
@@ -314,9 +317,12 @@
           var ajax_url = '/api/product/?format=datatables';
           var datatable = $("#example1").DataTable({
             "order": [[ 0, "desc" ]],
-            "scrollX": true,
-            "processing": true,
-            "serverSide": true,
+            "responsive": true,
+                "lengthChange": true,
+                "processing": true,
+                "autoWidth": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "serverSide": true,
             "ajax": '/api/product/?format=datatables',
             columns: [
               { data: 'id',visible: false, },
@@ -326,17 +332,55 @@
               { data: 'model.vendor.name' },
               { data: 'model.name' },
               { data: 'serial_num' },
-              { data: 'branch.code' },
-              { data: 'branch.name' },
-              { data: 'invoice_date' },
-              { data: 'invoce_no' },
-              { data: 'customer_code' },
+              { data: 'Action',"searchable": false,"orderable": false, "className":"align-middle text-center",
+                "render": function(data,type,full,meta){
+                  console.log(full)
+                  var rtn_str = "";
+                    if(access_modify == "true"){
+                  rtn_str = rtn_str + '<a dataId="'+ full.id + '"  class="terminal-edit"  href="/product/edit/'+ full.id +'/" title="Edit Poduct">\
+                    <i class="fas fa-edit text-primary"></i>\
+                    </a>';
+                  }
+                  if(access_delete == "true"){
+
+                    rtn_str = rtn_str + '<a dataId="'+ full.id + '" dataName="' + full.serial_num + '" class="product-delete" title="Delete">\
+                      <i class="fas fa-trash text-danger"></i>\
+                    </a>\
+                    ';
+                  }
+                  return rtn_str;
+
+                },
+
+              },
             ],
+            "fnDrawCallback": function(settings, json) {
+              $(".product-delete").click(function(){
+                // alertproductthis).attr("dataId"));
+                delete_product($(this).attr("dataId"),$(this).attr("dataName"));
+              });
+            },
             
 
 
           });
-
+          function delete_product(id,name) {
+              if(confirm("Are you Sure on Deleting the Product ["+ name+"]. Note: All the transactions on this Product  will also be deleted !!! ")){
+                $.ajax({
+                  headers: { "X-CSRFToken": csrf_token },
+                  type: "DELETE",
+                  url: "/api/product/"+id+"/",
+                  success: function(data, textStatus, xhr){
+                    console.log("In Success");
+                    console.log(xhr.status);
+                    console.log(data);
+                    alert("The Product is deleted")
+                    datatable.ajax.reload();
+                  },
+                });
+              }
+              
+            }
           $("#id_search").click(function (e) { 
             refreshUrl = '/api/product/?format=datatables';
             param = true;

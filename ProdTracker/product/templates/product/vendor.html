@@ -130,7 +130,7 @@
                   },
                   
                 ],
-                "initComplete": function(settings, json) {
+                "fnDrawCallback": function(settings, json) {
                   $(".vendor-delete").click(function(){
                     // alert($(this).attr("dataId"));
                     delete_vendor($(this).attr("dataId"),$(this).attr("dataName"));
