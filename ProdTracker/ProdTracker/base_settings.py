@@ -247,7 +247,28 @@ ADMIN_MENU = [
 
         "validators": [("accounts.menu_validators.has_menu_access","product")],
         "submenu":[
-            
+            {
+                "name": 'Modify/Delete',
+                "url": "product",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"prd_modify_del",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Purchase Modification and Deletion"),
+                "has_sub" : False,
+                "access_type": [
+                    {
+                        "type": "modify",
+                        "desc": _("Modify")
+                    },
+                    {
+                        "type": "delete",
+                        "desc": _("Delete")
+                    },
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","prd_modify_del")],
+            },            
             {
                 "name": 'Purchase',
                 "url": "purchase",
