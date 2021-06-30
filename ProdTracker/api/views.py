@@ -159,6 +159,10 @@ class ProductViewSet(viewsets.ModelViewSet):
             print("model")
             queryset = queryset.filter(
                 model__id=self.request.query_params.get('model', None))
+        if self.request.query_params.get('status', None):
+            print("status")
+            queryset = queryset.filter(
+                status=self.request.query_params.get('status', None))
 
         if self.request.query_params.get('pur_invoce_no', None):
             print("pur_invoce_no")
