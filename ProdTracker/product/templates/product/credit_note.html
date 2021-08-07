@@ -112,7 +112,29 @@
 <div class="card">
   
   <div class="card-body bg-gradient-dark">
+    <div class="row">
+      <div class="col-md-4 p-3">
+        <div class="form-group">
+          <label> Credit Note Date:</label>
+            <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                <input type="text" class="form-control  datetimepicker-input" data-target="#reservationdate" id="credit_note_date"/>
+                <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="col-md-8 p-3">
+        <div class="form-group">
+          <label for="">Remark</label>
+          <input type="text"
+            class="form-control" name="remark" id="id_remark" aria-describedby="helpId" placeholder="">
+          
+        </div>
+      </div>
+      
     
+    </div>
     <div class="row justify-content-center" >
       <div class="col-md-6">
          <div class="form-group">
@@ -537,7 +559,16 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
             });
 
             $("#transfer").click(function (e) {
-              
+              if ($.trim($("#credit_note_date").val()) == "") {
+                alert("Credit Note Date Cannot be null");
+                $("#credit_note_date").focus();
+                return false
+              }
+              if ($.trim($("#id_remark").val()) == "") {
+                alert("Please Enter Remark");
+                $("#id_remark").focus();
+                return false
+              }
               var products = sel_prd_table.rows({ selected: true }).data();
 
               if (products.length == 0) {
@@ -554,7 +585,7 @@ aria-labelledby="staticBackdrop" aria-hidden="true">
                 prd_ids.push(valueOfElement.id)
                     
               });
-              data={"products":prd_ids }
+              data={"products":prd_ids, "credit_note_date":$.trim($("#credit_note_date").val()),"remark": $.trim($("#id_remark").val())}
               console.log(data)
               
               // $('#overlay').fadeIn().delay(2000).fadeOut();

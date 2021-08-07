@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from product.models import Branch, Vendor, Product, Transfer, StockCheck,Model
-from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer
+from .serializers import BranchSerializer, VendorSerializer, ProductSerializer, TrasferSerializer, ProductAggSerializer,StockSummarySerializer
 from .serializers import StockCheckSerializer, UserSerializer,RoleSerializer,ProfileSerializer,ModelSerializer
 from django.db.models import Count,Q
 import datetime
@@ -266,11 +266,19 @@ class ProductViewSet(viewsets.ModelViewSet):
         print("Credit Note")
         response = {}
         products = request.POST.getlist('products[]')
+        credit_note_date = datetime.datetime.strptime(
+            request.POST["credit_note_date"], '%d-%m-%Y').date()
+        remark = request.POST["remark"]
         for product_id in products:
             product = Product.objects.get(id=product_id)
             product.invoce_no = None
             product.invoice_date = None
             product.customer_code = None
+            product.status = "I"
+            transfer = Transfer(product=product, branch=product.branch, date=credit_note_date,
+                                status="I", remark="Credit Note - {}".format(remark))
+            transfer.save()
+            StockCheck.objects.filter(product=product,month=credit_note_date.month,year=credit_note_date.year).delete()
             product.save()
         response["message"] = "Marked"
         return Response(response)
@@ -304,6 +312,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             product.status = "S"
 
             product.save()
+            stock = StockCheck(product=product, month=invoice_date.month, year=invoice_date.year)
+            stock.save()
         response["message"] = "Linked"
         return Response(response)
 
@@ -448,6 +458,39 @@ class ProductAggViewSet(viewsets.ModelViewSet):
                 first_day_of_this_month = datetime.date.today().replace(day=1)
                 return Product.objects.filter(invoce_no__isnull=True,purchase_date__gte=first_day_of_this_month).values('model').exclude(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)).annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
         return Product.objects.values('model').annotate(cnt=Count('id')).values('model__vendor__name', 'model__vendor__code', 'model__name', 'cnt')
+
+class StockSummaryViewSet(viewsets.ModelViewSet):
+    serializer_class = StockSummarySerializer
+    queryset = Product.objects.all()
+    paginator = None
+
+    def get_queryset(self):
+        today = datetime.datetime.today()
+        search_month = today.month
+        search_year = today.year
+        summary = Product.objects.values('model','branch')
+        if self.request.query_params.get('month', None):
+            search_month=self.request.query_params.get('month', None)
+        if self.request.query_params.get('year', None):
+            search_year=self.request.query_params.get('year', None)
+        if int(search_month) < 12:
+            next_month_start = datetime.date(int(search_year),int(search_month)+1,1)
+        else:
+            next_month_start = datetime.date(int(search_year)+1,1,1)
+        print(next_month_start)
+        summary = summary.filter(purchase_date__lt=next_month_start)
+        if self.request.query_params.get('vendor', None):
+            summary = summary.filter(model__vendor__id=self.request.query_params.get('vendor', None))
+        if self.request.query_params.get('model', None):
+            summary = summary.filter(model__id=self.request.query_params.get('model', None))
+        if self.request.query_params.get('branch', None):
+            summary = summary.filter(branch__id=self.request.query_params.get('branch', None))
+        
+        
+        summary = summary.annotate(available=Count('id', filter=Q(invoce_no__isnull=True)), stocked=Count('id', filter=Q(invoce_no__isnull=True) & Q(id__in=StockCheck.objects.filter(
+        month=search_month, year=search_year).values_list('product__id', flat=True)))).values('model__vendor__name', 'model__vendor__code', 'model__name', 'branch__name','available', 'stocked')
+        
+        return summary
 
 
 class TransferViewSet(viewsets.ModelViewSet):
