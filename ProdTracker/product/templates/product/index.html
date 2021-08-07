@@ -96,7 +96,48 @@
             </div>
           </div>
           <!-- ./col -->
-        </div><h2 class="mb-2 mt-4"> Stock Summary</h2>
+        </div>
+        <h2 class="mb-2 mt-4"> Branch Wise Summary</h2>
+        <div class="row">
+          <div class="col">
+            <table id="example1" class="table table-bordered table-striped table-sm">
+              <thead class="bg-gradient-info text-center">
+              <tr>
+                
+                <th>Branch</th>
+                <th>Total Purchase</th>
+                <th>Total Sale</th>
+                <th>Available</th>
+                <th>In Transit</th>
+                <th>Last month Stock Discrepancies</th>
+                <th>This month Stock Discrepancies</th>
+                
+                
+                
+        
+              </tr>
+              </thead>
+              <tbody class="text-center">
+              
+              {% for item in branch_wise %}
+                <tr>
+                  
+                  <td class="text-bold">{{item.branch__name}}</td>
+                  <td>{{item.tot_purchase}}</td>
+                  <td>{{item.sale}}</td>
+                  <td>{{item.uninvoiced}}</td>
+                  <td>{{item.intransit}}</td>
+                  <td>{{item.lastmonth}}</td>
+                  <td>{{item.thismonth}}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+              
+              
+            </table>
+          </div>
+        </div>
+        <h2 class="mb-2 mt-4"> Stock Summary</h2>
         
         <div class="row">
           <div class="col-lg-6 col-6">

@@ -268,7 +268,7 @@ ADMIN_MENU = [
                 ],
 
                 "validators": [("accounts.menu_validators.has_menu_access","prd_modify_del")],
-            },
+            },            
             {
                 "name": 'Purchase',
                 "url": "purchase",
@@ -504,6 +504,22 @@ ADMIN_MENU = [
                 ],
 
                 "validators": [("accounts.menu_validators.has_menu_access","summ_report")],
+            },
+            {
+                "name": 'Stock Summary Report',
+                "url": "stock-summ-report",
+                "icon_class" : "menu-bullet menu-bullet-dot",
+                "ref":"stock_summ_report",
+                'access_level': 'all',
+                "in_menu" : True,
+                'description': _("Stock Summary Report"),
+                "has_sub" : False,
+               "access_type": [
+                    {"type": "access",
+                    "desc": _("Has Access")}
+                ],
+
+                "validators": [("accounts.menu_validators.has_menu_access","stock_summ_report")],
             },
             {
                 "name": 'Transfers Report',

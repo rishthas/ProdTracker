@@ -53,12 +53,44 @@ def index(request):
             filter=Q(status="O")
             )
             )
+    branch_wise = Product.objects.values('branch').annotate(
+        tot_purchase=Count('id'),
+        uninvoiced=Count(
+            'id',
+            filter=Q(invoce_no__isnull=True)
+            ),
+        sale=Count(
+            'id',
+            filter=Q(invoce_no__isnull=False)
+            ),
+        lastmonth=Count(
+            'id',
+            filter=Q(
+                invoce_no__isnull=True,
+                purchase_date__lt=first_day_of_this_month)&
+                ~Q(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+            )
+            ),
+        thismonth=Count(
+            'id',
+            filter=Q(
+                invoce_no__isnull=True)&
+                ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
+
+            )
+            ),
+        intransit=Count(
+            'id',
+            filter=Q(status="O")
+            )
+    ).values('branch__name', 'tot_purchase','uninvoiced','sale','intransit','lastmonth','thismonth')
 
     start_date =   first_day_of_this_month - timedelta(days=365)
     vendor = Vendor.objects.all()
     models = Model.objects.all()
     print(start_date)  
-    return render(request,'product/index.html',{"this_month":this_month,'summary':summary,'vendors':vendor,'models':models})
+    
+    return render(request,'product/index.html',{"this_month":this_month,'summary':summary,'branch_wise':branch_wise,'vendors':vendor,'models':models})
 
 @login_required
 @check_access("branches","access")
@@ -114,7 +146,7 @@ def product(request):
 def summ_report(request):
     first_day_of_this_month = datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
     print(first_day_of_this_month)
-    summary = Product.objects.values('model').annotate(
+    summary = Product.objects.values('model','branch').annotate(
     tot_purchase=Count('id'),
     uninvoiced=Count(
         'id',
@@ -144,9 +176,38 @@ def summ_report(request):
         'id',
         filter=Q(status="O")
         )
-        ).values('model__vendor__name', 'model__vendor__code', 'model__name', 'tot_purchase','uninvoiced','sale','intransit','lastmonth','thismonth')
+        ).values('model__vendor__name', 'model__vendor__code', 'model__name','branch__name', 'tot_purchase','uninvoiced','sale','intransit','lastmonth','thismonth')
     print(summary.query)
     return render(request,'product/summ_report.html',{'summary':summary})
+
+@check_access("summ_report","access")
+def stock_summ_report(request):
+    branches = Branch.objects.all()
+    vendor = Vendor.objects.all()
+    models = Model.objects.all()
+    months = [
+        {"no":1,"text":"Jan"},
+        {"no":2,"text":"Feb"},
+        {"no":3,"text":"Mar"},
+        {"no":4,"text":"Apr"},
+        {"no":5,"text":"May"},
+        {"no":6,"text":"Jun"},
+        {"no":7,"text":"Jul"},
+        {"no":8,"text":"Aug"},
+        {"no":9,"text":"Sep"},
+        {"no":10,"text":"Oct"},
+        {"no":11,"text":"Nov"},
+        {"no":12,"text":"Dec"},
+    ]
+    today = datetime.today()
+    current_year = today.year
+    current_month = today.month
+    print(current_month)
+    years = []
+    for i in range(current_year-5,current_year+5):
+        years.append(i)
+    
+    return render(request,'product/stock_summ_report.html',{'branches':branches,'vendors':vendor,'months':months,'years':years,'current_year':current_year,'current_month':current_month,'models':models})
 
 @login_required
 @check_access("stock_rpt","access")

@@ -91,7 +91,29 @@ class ProductAggSerializer(serializers.ModelSerializer):
         print(obj)
         return obj['model__name']
         
+class StockSummarySerializer(serializers.ModelSerializer):
+    available = serializers.IntegerField()
+    stocked = serializers.IntegerField()
+    vendor_name = serializers.SerializerMethodField()
+    vendor_code = serializers.SerializerMethodField()
+    model_no = serializers.SerializerMethodField()
+    branch_name = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = ('vendor_name','vendor_code','model_no', 'branch_name','available','stocked')
+    def get_vendor_name(self,obj):
+        # print(obj)
+        return obj['model__vendor__name']
 
+    def get_vendor_code(self,obj):
+        # print(obj)
+        return obj['model__vendor__code']
+
+    def get_model_no(self,obj):
+        # print(obj)
+        return obj['model__name']
+    def get_branch_name(self,obj):
+        return obj['branch__name']
 class TrasferSerializer(serializers.ModelSerializer):
     Action = serializers.CharField(max_length=50,default=None,read_only=True)
     status = serializers.CharField(source='get_status_display')
