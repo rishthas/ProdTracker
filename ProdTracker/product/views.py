@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 from .decorators import check_access
 import xlwt
 from django.http import HttpResponse
-import datetime
+# import datetime
 import calendar
 
 
@@ -152,19 +152,19 @@ def report_export(request):
     queryset = Product.objects.all()
     if request.GET.get('p_from_date', None):
         print("p_from_date")
-        queryset = queryset.filter(purchase_date__gte=datetime.datetime.strptime(
+        queryset = queryset.filter(purchase_date__gte=datetime.strptime(
             request.GET.get('p_from_date', None), '%d-%m-%Y').date())
     if request.GET.get('p_to_date', None):
         print("p_to_date")
-        queryset = queryset.filter(purchase_date__lte=datetime.datetime.strptime(
+        queryset = queryset.filter(purchase_date__lte=datetime.strptime(
             request.GET.get('p_to_date', None), '%d-%m-%Y').date())
     if request.GET.get('i_from_date', None):
         print("i_from_date")
-        queryset = queryset.filter(invoice_date__gte=datetime.datetime.strptime(
+        queryset = queryset.filter(invoice_date__gte=datetime.strptime(
             request.GET.get('i_from_date', None), '%d-%m-%Y').date())
     if request.GET.get('i_to_date', None):
         print("i_to_date")
-        queryset = queryset.filter(invoice_date__lte=datetime.datetime.strptime(
+        queryset = queryset.filter(invoice_date__lte=datetime.strptime(
             request.GET.get('i_to_date', None), '%d-%m-%Y').date())
 
     if request.GET.get('branch', None):
