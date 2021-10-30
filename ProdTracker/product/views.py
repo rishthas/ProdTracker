@@ -10,7 +10,8 @@ from django.conf import settings
 from accounts.models import RoleAccess
 from django.db.models import Count, Q
 from .decorators import check_access
-
+import xlwt
+from django.http import HttpResponse
 
 
 
@@ -129,6 +130,87 @@ def report(request):
     models = Model.objects.all()
 
     return render(request,'product/report.html',{'branches':branches,'vendors':vendor,'models':models})
+
+@login_required
+# @check_access("prd_report","access")
+def report_export(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="products_report.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Products')
+    # Sheet header, first row
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Purchase Id', 'Purchase Date', 'Vendor Code', 'Vendore Name','Model','Serial No','Branch Code','Branch Name','Invoice Date','Invoice Name','Customer' ]
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+     # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    queryset = Product.objects.all()
+    if request.GET.get('p_from_date', None):
+        print("p_from_date")
+        queryset = queryset.filter(purchase_date__gte=datetime.datetime.strptime(
+            request.GET.get('p_from_date', None), '%d-%m-%Y').date())
+    if request.GET.get('p_to_date', None):
+        print("p_to_date")
+        queryset = queryset.filter(purchase_date__lte=datetime.datetime.strptime(
+            request.GET.get('p_to_date', None), '%d-%m-%Y').date())
+    if request.GET.get('i_from_date', None):
+        print("i_from_date")
+        queryset = queryset.filter(invoice_date__gte=datetime.datetime.strptime(
+            request.GET.get('i_from_date', None), '%d-%m-%Y').date())
+    if request.GET.get('i_to_date', None):
+        print("i_to_date")
+        queryset = queryset.filter(invoice_date__lte=datetime.datetime.strptime(
+            request.GET.get('i_to_date', None), '%d-%m-%Y').date())
+
+    if request.GET.get('branch', None):
+        print("branch")
+        queryset = queryset.filter(
+            branch__id=request.GET.get('branch', None))
+    if request.GET.get('vendor', None):
+        print("vendor")
+        queryset = queryset.filter(
+            model__vendor__id=request.GET.get('vendor', None))
+    if request.GET.get('model', None):
+        print("model")
+        queryset = queryset.filter(
+            model__id=request.GET.get('model', None))
+    if request.GET.get('status', None):
+        print("status")
+        queryset = queryset.filter(
+            status=request.GET.get('status', None))
+
+    if request.GET.get('pur_invoce_no', None):
+        print("pur_invoce_no")
+        queryset = queryset.filter(
+            pur_invoce_no__icontains=request.GET.get('pur_invoce_no', None))
+    if request.GET.get('serial_num', None):
+        print("serial_num")
+        queryset = queryset.filter(
+            serial_num=request.GET.get('serial_num', None))
+    if request.GET.get('invoice_no', None):
+        print("invoice_no")
+        queryset = queryset.filter(
+            invoce_no=request.GET.get('invoice_no', None))
+
+    if request.GET.get('cust_code', None):
+        print("cust_code")
+        queryset = queryset.filter(
+            customer_code=request.GET.get('cust_code', None))
+
+    rows = queryset.values_list('pur_invoce_no','purchase_date','model__vendor__code','model__vendor__name','model__name','serial_num','branch__code','branch__name','invoice_date','invoce_no','customer_code')
+    print(rows)
+    # rows = User.objects.all().values_list('username', 'first_name', 'last_name', 'email')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
 
 @login_required
 @check_access("prd_modify_del","access")

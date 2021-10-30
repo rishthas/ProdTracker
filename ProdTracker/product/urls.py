@@ -11,6 +11,8 @@ urlpatterns = [
     path('purchase/', views.purchase,name="purchase"),
     path('stock/', views.stock_check,name="stock"),
     path('report/', views.report,name="report"),
+    path('report/product/export', views.report_export,name="report-export"),
+    
     path('report/summary', views.summ_report,name="summ-report"),
     path('report/stock/summary', views.stock_summ_report,name="stock-summ-report"),
     path('report/stocks', views.stock_report,name="stock-report"),
