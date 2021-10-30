@@ -47,6 +47,56 @@
     			vertical-align: middle;
 			}
   </style>
+  <style>
+    th{
+				white-space: nowrap ;
+				text-align: center; 
+    			vertical-align: middle;
+          padding-left: 10px;
+			}
+      td{
+				white-space: nowrap ;
+				text-align: center; 
+    			vertical-align: middle;
+			}
+      #overlay {
+        background: #ffffff;
+        color: #666666;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        z-index: 5000;
+        top: 0;
+        left: 0;
+        float: left;
+        text-align: center;
+        padding-top: 25%;
+        opacity: .80;
+      }
+      button {
+        margin: 40px;
+        padding: 5px 20px;
+        cursor: pointer;
+      }
+      .spinner {
+          margin: 0 auto;
+          height: 64px;
+          width: 64px;
+          animation: rotate 0.8s infinite linear;
+          border: 5px solid firebrick;
+          border-right-color: transparent;
+          border-radius: 50%;
+      }
+      @keyframes rotate {
+          0% {
+              transform: rotate(0deg);
+          }
+          100% {
+              transform: rotate(360deg);
+          }
+      }
+      
+  </style>
 {% endblock pagecss %}
 
  {% block breadcrums %}
@@ -209,7 +259,8 @@
       </div>
     </div>
     <div class="row justify-content-center">
-      <button type="button" id="id_search" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
+      <button type="button" id="id_search" class="btn btn-primary m-1"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
+      <button type="button" id="id_export" class="btn btn-success m-1"><i class="fas fa-file-excel"></i> Export</button>
 
     </div>
     
@@ -251,6 +302,11 @@
     </table>
   </div>
   <!-- /.card-body -->
+</div>
+<div id="overlay" style="display:none;">
+  <div class="spinner"></div>
+  <br/>
+  <h2>Please Wait while System Credit Notes to the product...</h2>
 </div>
 {% endblock maincontent %}
 
@@ -352,7 +408,63 @@
 
 
           });
+          $("#id_export").click(function (e) { 
+            // $('#overlay').fadeIn();
+            refreshUrl = '/report/product/export?with_data=Yes';
+            param = true;
+            if ($("#id_p_from_date").val()){
+                    refreshUrl = refreshUrl + '&p_from_date='+ $("#id_p_from_date").val();
+                
+            }
+            if ($("#id_p_to_date").val()){
+                    refreshUrl = refreshUrl + '&p_to_date='+ $("#id_p_to_date").val();
+                
+            }
+            if ($("#id_i_from_date").val()){
+                    refreshUrl = refreshUrl + '&i_from_date='+ $("#id_i_from_date").val();
+                
+            }
+            if ($("#id_i_to_date").val()){
+                    refreshUrl = refreshUrl + '&i_to_date='+ $("#id_i_to_date").val();
+                
+            }
+            if ($("#id_branch").val()){
+                    refreshUrl = refreshUrl + '&branch='+ $("#id_branch").val();
+                
+            }
+            if ($("#id_vendor").val()){
+                    refreshUrl = refreshUrl + '&vendor='+ $("#id_vendor").val();
+                
+            }
+            if ($("#model").val()){
+                    refreshUrl = refreshUrl + '&model='+ $("#model").val();
+                
+            }
+            if ($("#status").val()){
+                    refreshUrl = refreshUrl + '&status='+ $("#status").val();
+                
+            }
+            if ($("#serial_num").val()){
+                    refreshUrl = refreshUrl + '&serial_num='+ $("#serial_num").val();
+                
+            }
+            if ($("#pur_invoce_no").val()){
+                    refreshUrl = refreshUrl + '&pur_invoce_no='+ $("#pur_invoce_no").val();
+                
+            }
+            if ($("#invoice_no").val()){
+                    refreshUrl = refreshUrl + '&invoice_no='+ $("#invoice_no").val();
+                
+            }
+            if ($("#cust_code").val()){
+                    refreshUrl = refreshUrl + '&cust_code='+ $("#cust_code").val();
+                
+            }
+            window.open(refreshUrl, '_blank');
+            // $('#overlay').fadeOut();
 
+            
+          });
           $("#id_search").click(function (e) { 
             refreshUrl = '/api/product/?format=datatables';
             param = true;
