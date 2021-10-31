@@ -204,11 +204,19 @@ def report_export(request):
 
     rows = queryset.values_list('pur_invoce_no','purchase_date','model__vendor__code','model__vendor__name','model__name','serial_num','branch__code','branch__name','invoice_date','invoce_no','customer_code')
     print(rows)
+    date_format = xlwt.XFStyle()
+    date_format.num_format_str = 'dd/mm/yyyy'
+
     # rows = User.objects.all().values_list('username', 'first_name', 'last_name', 'email')
     for row in rows:
         row_num += 1
+        col = 0
         for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
+            if col == 1 or col == 8 :
+                ws.write(row_num, col_num, row[col_num], date_format)
+            else:
+                ws.write(row_num, col_num, row[col_num], font_style)
+            col = col + 1
 
     wb.save(response)
     return response
