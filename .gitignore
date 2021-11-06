@@ -78,3 +78,6 @@ dmypy.json
 ProdTrackerEnv/
 .vscode/settings.json
 ProdTracker/db_safe.sqlite3
+ProdTracker/db_alpha1.sqlite3
+ProdTracker/db_alpha.sqlite3
+ProdTracker/db_alpha.sqlite3
