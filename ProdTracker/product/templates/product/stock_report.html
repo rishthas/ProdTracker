@@ -174,13 +174,17 @@
     <table id="example1" class="table table-bordered table-striped table-sm">
       <thead class="thead-dark">
       <tr>
-        
+        <th>Purchase ID</th>
+        <th>Purchase Date</th>
         <th>Vendor Code</th>
         <th>Vendor Name</th>
         <th>Model</th>
         <th>Serial No</th>
         <th>Branch Code</th>
         <th>Branch Name</th>
+        <th>Invoice Date</th>
+        <th>Invoice No</th>
+        <th>Customer Code</th>
         
         
 
@@ -267,13 +271,17 @@
             "autoWidth": false,
             "ajax": '/api/product/?format=datatables&stock_rpt=Y&stock='+gld_stock+'&month='+$("#month").val()+'&year='+$("#year").val(),
             columns: [
-              
+              { data: 'pur_invoce_no' },
+              { data: 'purchase_date' },
               { data: 'model.vendor.code' },
               { data: 'model.vendor.name' },
               { data: 'model.name' },
               { data: 'serial_num' },
               { data: 'branch.code' },
               { data: 'branch.name' },
+              { data: 'invoice_date' },
+              { data: 'invoce_no' },
+              { data: 'customer_code' },
               
             ]
 

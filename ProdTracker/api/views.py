@@ -186,9 +186,9 @@ class ProductViewSet(viewsets.ModelViewSet):
             # queryset = queryset.filter(invoce_no__isnull=True)
             if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
                 print("In Month")
-                ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
+                ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1) - datetime.timedelta(days=1)
                 print(ref_date)
-                queryset = queryset.filter(Q(purchase_date__lt=ref_date) & Q(Q(invoce_no__isnull=True) | Q(invoice_date__gte=ref_date)))
+                queryset = queryset.filter(Q(purchase_date__lte=ref_date) & Q(Q(invoce_no__isnull=True) | Q(invoice_date__gt=ref_date)))
 
                 if self.request.query_params.get('stock', None) == "Y":
                     queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
