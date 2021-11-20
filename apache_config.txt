@@ -21,3 +21,24 @@ create database aimserp;
 CREATE USER 'aims'@'localhost' IDENTIFIED BY 'aims#2021';
 GRANT ALL PRIVILEGES ON aimserp.* to 'aims'@'localhost';
 FLUSH PRIVILEGES;
+
+<VirtualHost *:80>
+    
+    DocumentRoot /aims/ProdTracker/ProdTracker
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    Alias /static /aims/ProdTracker/ProdTracker/static
+    <Directory /aims/ProdTracker/ProdTracker>
+        Require all granted
+    </Directory>
+    <Directory /aims/ProdTracker/ProdTracker/ProdTracker>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+    WSGIDaemonProcess ProdTracker python-path=/aims/ProdTracker/ProdTracker python-home=/aims/venv
+    WSGIProcessGroup ProdTracker
+    WSGIScriptAlias /aims/ProdTracker/ProdTracker/ProdTracker/wsgi.py
+
+</VirtualHost>
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
