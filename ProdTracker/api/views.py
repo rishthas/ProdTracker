@@ -186,7 +186,10 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(invoce_no__isnull=True)
             if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
                 print("In Month")
-                ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
+                if int(self.request.query_params.get('month')) == 12:
+                    ref_date = datetime.date(int(self.request.query_params.get('year')+1), 1, 1)
+                else:
+                    ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
                 print(ref_date)
                 queryset = queryset.filter(purchase_date__lt=ref_date)
 
