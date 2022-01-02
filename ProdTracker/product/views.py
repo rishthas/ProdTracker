@@ -22,7 +22,12 @@ import calendar
 @login_required
 def index(request):
     first_day_of_this_month = datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+    print("first_day_of_this_month")
     print(first_day_of_this_month)
+    first_date_of_last_month =   (first_day_of_this_month - timedelta(days=1)).replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+    print("first_date_of_last_month")
+    print(first_date_of_last_month)
+
     this_month = datetime.today().strftime("%b-%Y")
     summary = Product.objects.aggregate(
         tot_purchase=Count('id'),
@@ -39,7 +44,7 @@ def index(request):
             filter=Q(
                 invoce_no__isnull=True,
                 purchase_date__lt=first_day_of_this_month)&
-                ~Q(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+                ~Q(id__in=StockCheck.objects.filter(Q(month=first_date_of_last_month.month,year=first_date_of_last_month.year)).values_list('product__id', flat=True)    
             )
             ),
         thismonth=Count(
@@ -70,7 +75,7 @@ def index(request):
             filter=Q(
                 invoce_no__isnull=True,
                 purchase_date__lt=first_day_of_this_month)&
-                ~Q(id__in=StockCheck.objects.filter(Q(month__lt=first_day_of_this_month.month,year=first_day_of_this_month.year)|Q(year__lt=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+                ~Q(id__in=StockCheck.objects.filter(Q(month=first_date_of_last_month.month,year=first_date_of_last_month.year)).values_list('product__id', flat=True)    
             )
             ),
         thismonth=Count(
@@ -90,6 +95,7 @@ def index(request):
     start_date =   first_day_of_this_month - timedelta(days=365)
     vendor = Vendor.objects.all()
     models = Model.objects.all()
+    print("start_date")  
     print(start_date)  
     
     return render(request,'product/index.html',{"this_month":this_month,'summary':summary,'branch_wise':branch_wise,'vendors':vendor,'models':models})

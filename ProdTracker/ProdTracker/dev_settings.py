@@ -15,6 +15,8 @@ from django.utils.translation import ugettext_lazy as _
 from .base_settings import *
 
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 
 # Database
