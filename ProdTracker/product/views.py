@@ -22,9 +22,12 @@ import calendar
 @login_required
 def index(request):
     first_day_of_this_month = datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
-    first_day_of_last_month =   datetime(first_day_of_this_month.year-1, 12, 1) if first_day_of_this_month.month == 1 else datetime(first_day_of_this_month.year,first_day_of_this_month.month-1,1)
+    print("first_day_of_this_month")
     print(first_day_of_this_month)
-    print(first_day_of_last_month)
+    first_date_of_last_month =   (first_day_of_this_month - timedelta(days=1)).replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+    print("first_date_of_last_month")
+    print(first_date_of_last_month)
+
     this_month = datetime.today().strftime("%b-%Y")
     summary = Product.objects.aggregate(
         tot_purchase=Count('id'),
@@ -39,16 +42,16 @@ def index(request):
         lastmonth=Count(
             'id',
             filter=Q(
-                
-                purchase_date__lt=first_day_of_this_month)&Q(Q(invoce_no__isnull=True)|Q(invoice_date__gte=first_day_of_this_month))&
-                ~Q(id__in=StockCheck.objects.filter(Q(month=first_day_of_last_month.month,year=first_day_of_this_month.year)).values_list('product__id', flat=True)    
+                invoce_no__isnull=True,
+                purchase_date__lt=first_day_of_this_month)&
+                ~Q(id__in=StockCheck.objects.filter(Q(month=first_date_of_last_month.month,year=first_date_of_last_month.year)).values_list('product__id', flat=True)    
             )
             ),
         thismonth=Count(
             'id',
             filter=Q(
                 invoce_no__isnull=True)&
-                ~Q(id__in=StockCheck.objects.filter(month=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
+                ~Q(id__in=StockCheck.objects.filter(month__gte=first_day_of_this_month.month,year=first_day_of_this_month.year).values_list('product__id', flat=True)    
 
             )
             ),
@@ -57,7 +60,6 @@ def index(request):
             filter=Q(status="O")
             )
             )
-    print(summary)  
     branch_wise = Product.objects.values('branch').annotate(
         tot_purchase=Count('id'),
         uninvoiced=Count(
@@ -71,10 +73,10 @@ def index(request):
         lastmonth=Count(
             'id',
             filter=Q(
-                
-                purchase_date__lt=first_day_of_this_month)&Q(Q(invoce_no__isnull=True)|Q(invoice_date__gte=first_day_of_this_month))&
-                ~Q(id__in=StockCheck.objects.filter(Q(month=first_day_of_last_month.month,year=first_day_of_this_month.year)).values_list('product__id', flat=True)    
-            ),distinct=True
+                invoce_no__isnull=True,
+                purchase_date__lt=first_day_of_this_month)&
+                ~Q(id__in=StockCheck.objects.filter(Q(month=first_date_of_last_month.month,year=first_date_of_last_month.year)).values_list('product__id', flat=True)    
+            )
             ),
         thismonth=Count(
             'id',
@@ -89,10 +91,11 @@ def index(request):
             filter=Q(status="O")
             )
     ).values('branch__name', 'tot_purchase','uninvoiced','sale','intransit','lastmonth','thismonth')
-    
+
     start_date =   first_day_of_this_month - timedelta(days=365)
     vendor = Vendor.objects.all()
     models = Model.objects.all()
+    print("start_date")  
     print(start_date)  
     
     return render(request,'product/index.html',{"this_month":this_month,'summary':summary,'branch_wise':branch_wise,'vendors':vendor,'models':models})
