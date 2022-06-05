@@ -114,7 +114,7 @@
         </div>
       </div>
     
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group">
           <label>Vendor</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
@@ -128,7 +128,7 @@
           </select>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
 
         <div class="form-group">
           <label>Model</label>
@@ -143,7 +143,23 @@
           </select>
         </div>
       </div>
-      <div class="col-md-2">
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Branch</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="id_branch">
+            <option value=""></option>
+
+            {% for branch in branches %}
+              <option value="{{branch.id}}">{{branch.code}}/{{branch.name}}</option>
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
           <label>Stocked for the month</label><br>
           <input type="checkbox" id="stock" name="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success" data-height="75"  data-off-text="No" data-on-text="Yes">
@@ -174,13 +190,17 @@
     <table id="example1" class="table table-bordered table-striped table-sm">
       <thead class="thead-dark">
       <tr>
-        
+        <th>Purchase ID</th>
+        <th>Purchase Date</th>
         <th>Vendor Code</th>
         <th>Vendor Name</th>
         <th>Model</th>
         <th>Serial No</th>
         <th>Branch Code</th>
         <th>Branch Name</th>
+        <th>Invoice Date</th>
+        <th>Invoice No</th>
+        <th>Customer Code</th>
         
         
 
@@ -267,13 +287,17 @@
             "autoWidth": false,
             "ajax": '/api/product/?format=datatables&stock_rpt=Y&stock='+gld_stock+'&month='+$("#month").val()+'&year='+$("#year").val(),
             columns: [
-              
+              { data: 'pur_invoce_no' },
+              { data: 'purchase_date' },
               { data: 'model.vendor.code' },
               { data: 'model.vendor.name' },
               { data: 'model.name' },
               { data: 'serial_num' },
               { data: 'branch.code' },
               { data: 'branch.name' },
+              { data: 'invoice_date' },
+              { data: 'invoce_no' },
+              { data: 'customer_code' },
               
             ]
 

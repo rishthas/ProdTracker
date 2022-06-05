@@ -183,15 +183,15 @@ class ProductViewSet(viewsets.ModelViewSet):
                 customer_code=self.request.query_params.get('cust_code', None))
 
         if self.request.query_params.get('stock_rpt', None) == "Y":
-            queryset = queryset.filter(invoce_no__isnull=True)
+            # queryset = queryset.filter(invoce_no__isnull=True)
             if self.request.query_params.get('month', None) and self.request.query_params.get('year', None):
                 print("In Month")
                 if int(self.request.query_params.get('month')) == 12:
-                    ref_date = datetime.date(int(self.request.query_params.get('year'))+1, 1, 1)
+                    ref_date = datetime.date(int(self.request.query_params.get('year'))+1, 1, 1) - datetime.timedelta(days=1)
                 else:
-                    ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1)
+                    ref_date = datetime.date(int(self.request.query_params.get('year')), int(self.request.query_params.get('month'))+1, 1) - datetime.timedelta(days=1)
                 print(ref_date)
-                queryset = queryset.filter(purchase_date__lt=ref_date)
+                queryset = queryset.filter(Q(purchase_date__lte=ref_date) & Q(Q(invoce_no__isnull=True) | Q(invoice_date__gt=ref_date)))
 
                 if self.request.query_params.get('stock', None) == "Y":
                     queryset = queryset.filter(id__in=StockCheck.objects.filter(month=self.request.query_params.get(
@@ -206,6 +206,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                     queryset = queryset.filter(id__in=StockCheck.objects.values_list('product__id', flat=True))
                 else:
                     queryset = queryset.exclude(id__in=StockCheck.objects.values_list('product__id', flat=True))
+            if self.request.query_params.get('branch', None):
+                print("branch")
+                queryset = queryset.filter(
+                    branch__id=self.request.query_params.get('branch', None))
             print(queryset.query)
 
         queryset = queryset.order_by('-id')
@@ -269,6 +273,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         print("Credit Note")
         response = {}
         products = request.POST.getlist('products[]')
+        first_day_of_this_month = datetime.datetime.today().replace(day=1,hour=0,minute=0,second=0,microsecond=0)
+
         credit_note_date = datetime.datetime.strptime(
             request.POST["credit_note_date"], '%d-%m-%Y').date()
         remark = request.POST["remark"]
@@ -281,7 +287,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             transfer = Transfer(product=product, branch=product.branch, date=credit_note_date,
                                 status="I", remark="Credit Note - {}".format(remark))
             transfer.save()
-            StockCheck.objects.filter(product=product,month=credit_note_date.month,year=credit_note_date.year).delete()
+            if credit_note_date.month == first_day_of_this_month.month and credit_note_date.year == first_day_of_this_month.year:
+                StockCheck.objects.filter(product=product,month=credit_note_date.month,year=credit_note_date.year).delete()
             product.save()
         response["message"] = "Marked"
         return Response(response)
