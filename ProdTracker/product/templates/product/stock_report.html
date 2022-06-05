@@ -114,7 +114,7 @@
         </div>
       </div>
     
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group">
           <label>Vendor</label>
           <select class="form-control  select2bs4" style="width: 100%;" id="vendor">
@@ -128,7 +128,7 @@
           </select>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
 
         <div class="form-group">
           <label>Model</label>
@@ -143,7 +143,23 @@
           </select>
         </div>
       </div>
-      <div class="col-md-2">
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Branch</label>
+          <select class="form-control  select2bs4" style="width: 100%;" id="id_branch">
+            <option value=""></option>
+
+            {% for branch in branches %}
+              <option value="{{branch.id}}">{{branch.code}}/{{branch.name}}</option>
+
+            {% endfor %}
+            
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
           <label>Stocked for the month</label><br>
           <input type="checkbox" id="stock" name="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success" data-height="75"  data-off-text="No" data-on-text="Yes">

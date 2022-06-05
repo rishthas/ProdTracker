@@ -206,6 +206,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                     queryset = queryset.filter(id__in=StockCheck.objects.values_list('product__id', flat=True))
                 else:
                     queryset = queryset.exclude(id__in=StockCheck.objects.values_list('product__id', flat=True))
+            if self.request.query_params.get('branch', None):
+                print("branch")
+                queryset = queryset.filter(
+                    branch__id=self.request.query_params.get('branch', None))
             print(queryset.query)
 
         queryset = queryset.order_by('-id')

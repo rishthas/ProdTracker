@@ -24,7 +24,7 @@ DEBUG = True
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db_alpha1.sqlite3',
+       'NAME': BASE_DIR / 'db_alpha.sqlite3',
    }
 }
 
